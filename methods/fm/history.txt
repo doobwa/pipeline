@@ -1,0 +1,6 @@
+== 1.10 ==
+* Add: ALS optimization for regression FMs (see paper Rendle et al.: "Fast Context-aware Recommendations with Factorization Machines", SIGIR 2011)
+* Add: script to convert files in a triple format (e.g. "userid itemid rating" which is often used in recommender systems) to the libFM format.
+* Improvement: using the method of Leva for generating Gaussian random numbers
+* Bugfix: add typedef for uint
+
