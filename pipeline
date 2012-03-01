@@ -1,0 +1,21 @@
+#!/bin/bash
+
+case "$1" in
+    init)
+        ./setup.r
+        ;;
+    status)
+        cat queue
+        ;;
+    add)
+        if [ "$2" == "dataset" ] ; then
+            kv.script datasets add "$3"
+        elif [ "$2" == "method" ] ; then
+            kv.script methods add "$3"
+        fi
+        ;;
+    *)
+        echo "usage: $0 { }"
+        ;;
+esac
+exit 0
