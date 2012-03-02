@@ -1,0 +1,35 @@
+#!/bin/bash
+
+action=$1;
+filename=$2;
+key=$3;
+if [ $# -gt 3 ]; then
+    value=$4;
+fi
+
+finalize() {
+    if [ $? == 0 ]; then
+        mv ${filename}.tmp $filename
+    else
+        rm ${filename}.tmp
+    fi
+}
+
+case "$1" in
+    add)
+        awk "BEGIN{found=0} \$1~/$key/ {found=1} {print} END{if (!found) {print \"$key\", \"$value\"}}" $filename > ${filename}.tmp
+        finalize
+        ;;
+    set)
+        awk "BEGIN{found=0} \$1~/$key/ {print \$1, \"$value\"; found=1} \$1!~/$key/ {print} END{if (!found) {print \"$key\", \"$value\"}}" $filename > ${filename}.tmp
+        finalize
+        ;;
+    remove)
+        awk "\$1!~/$key/" $filename > ${filename}.tmp
+        finalize
+        ;;
+    *)
+        echo "usage: [add|remove|set] blah"
+        ;;
+esac
+exit 0

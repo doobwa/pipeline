@@ -3,9 +3,11 @@
 case "$1" in
     init)
         chmod 755 pipeline/parallel
-        chmod 755 pipeline/setup.r
+        chmod 755 pipeline/utils/setup.r
+        chmod 755 pipeline/utils/kv
         chmod 755 pipeline/methods/fm/bin/libFM
         chmod 755 pipeline/methods/vw/vw
+        mkdir config
         ./pipeline/setup.r
         ;;
     status)
@@ -13,20 +15,21 @@ case "$1" in
         ;;
     add)
         if [ "$2" == "dataset" ] ; then
-            ./utils/keyvalue.sh add config/datasets "$3"
+            ./utils/kv add config/datasets "$3"
         elif [ "$2" == "method" ] ; then
-            ./utils/keyvalue.sh add config/methods "$3"
+            ./utils/kv add config/methods "$3"
         fi
         ;;
     remove)
         if [ "$2" == "dataset" ] ; then
-            ./utils/keyvalue.sh remove config/datasets "$3"
+            ./utils/kv remove config/datasets "$3"
         elif [ "$2" == "method" ] ; then
-            ./utils/keyvalue.sh remove config/methods "$3"
+            ./utils/kv remove config/methods "$3"
         fi
         ;;
     push) 
         ./pipeline/remotes/datalab queue
+        ;;
     *)
         echo "usage: $0 { }"
         ;;
