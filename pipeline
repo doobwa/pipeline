@@ -28,7 +28,7 @@ case "$1" in
         fi
         ;;
     push) 
-        ./pipeline/remotes/datalab queue
+        ./pipeline/remotes/datalab
         ;;
     *)
         echo "usage: $0 { }"

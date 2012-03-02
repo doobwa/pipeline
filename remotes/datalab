@@ -1,0 +1,28 @@
+#!/usr/bin/env Rscript
+# Execute commands in config/queue in parallel across datalab machines.  
+# Looks to see which are available.
+
+# TODO: Allow some commands to be executed serially.
+
+# This looks potentially relevant to what we're trying to do here.
+# http://www.gnu.org/software/parallel/man.html#example__gnu_parallel_as_queue_system_batch_manager
+
+ 
+# For each datalab machine
+hosts <- paste("d",12:1,sep="")  # prefer newer datalabs
+number.used <- sapply(hosts, function(h) {
+  command <- paste('ssh ',h,' \"ps -eo pcpu,pid,user | sort -r | head -9\" ',sep='')
+  x <- read.table(pipe(command),header=TRUE)
+  sum(x$X.CPU > 50)
+})
+
+#NOTE:               cpu utilization of the process in "##.#" format.
+#                    Currently, it is the CPU time used divided by the time the
+#                    process has been running (cputime/realtime ratio),
+#                    expressed as a percentage. It will not add up to 100%
+#                    unless you are lucky. (alias pcpu).
+# I've seen it vary from what top reports for long running processes.
+
+remotes <- paste(8-number.used,hosts,sep="/",collapse=",")
+
+system(paste("echo >config/queue | parallel -S ",remotes))
