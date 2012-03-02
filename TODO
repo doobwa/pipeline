@@ -1,0 +1,30 @@
+TODO:
+
+pipeline push
+- Allow some commands to be executed serially.
+- remote datalab: check ram usage
+- Figure out how to check usage for multiple machines faster.
+
+kv
+- Rewrite / nix this in favor a JSON solution.
+- Add "get" and "in" commands.
+- Add some error checking and write stuff to stderr.
+
+(GNU) parallel
+- We may want to use the following options: 
+    --eta and/or --progress: could be useful for setting up a dashboard.
+    --joblog: also for dashboard.
+    --load: simplifies the CPU usage checking task.
+    --nonall: might speed up manual resource checking on multiple machines.
+    --nice: to be nice to datalab :).
+    -J: keep common configurations in profiles.
+    --retries: adjust number of times to retry a failed job.
+    --noswap: seems like a generally good idea, but may not "kick in" until 
+      it's too late.
+    --use-cpus-instead-of-cores: not sure if we need this, but it's 
+      potentially relevant.
+
+Concurrent pipeline usage
+- How do we both work on a competition at the same time? Do we each have 
+  separate copies of all the data, or do we just link to a shared 
+  directory?
