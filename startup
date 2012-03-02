@@ -1,4 +1,4 @@
 #!/bin/bash
 
 # Correct paths
-export PATH=$PATH:`pwd`/pipeline
+export PATH=`pwd`/pipeline:$PATH
