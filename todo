@@ -1,0 +1,6 @@
+TODO:
+
+pipeline push
+- Allow some commands to be executed serially.
+- remote datalab: check ram usage
+- Figure out how to check usage for multiple machines faster.

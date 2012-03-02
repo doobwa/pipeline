@@ -36,6 +36,9 @@ case "$1" in
             ./utils/kv remove config/methods "$3"
         fi
         ;;
+    eval) 
+        
+        ;;
     push) 
         ./pipeline/remotes/datalab
         ;;
