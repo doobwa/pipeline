@@ -1,0 +1,36 @@
+#!/usr/bin/env Rscript
+
+# Creates a set of K-fold cross validation datasets for the supplied file,
+# e.g. a training set.  The row indices (0-based) are saved to text files
+# in splits/[k]fold/x for x = [0, ..., K].  The 0 split includes the entire 
+# training set.
+
+suppressPackageStartupMessages(library("optparse"))
+
+option_list <- list(
+  make_option("--K", default=5, help="Number of cross validation folds.")
+)
+parser <- OptionParser(usage = "%prog [options] datafile", option_list=option_list)
+arguments <- parse_args(parser, positional_arguments = TRUE)
+
+filename <- arguments$args
+K <- arguments$options$K
+
+x <- read.csv(filename)
+M <- nrow(x)
+cvsplit <- as.numeric(cut(1:M,K))
+dir.create(paste("splits/",K,"fold",sep=""),showWarnings=FALSE)
+for (i in K:1) {
+  cat(".")
+  dir.create(paste("splits/",K,"fold/",i,sep=""),showWarnings=FALSE)
+  train.ix <- which(cvsplit != i)
+  test.ix  <- which(cvsplit == i)
+  write(paste(train.ix - 1,collapse="\n"),
+        file=paste("splits/",K,"fold/",i,"/train.txt",sep=""))
+  write(paste(test.ix - 1,collapse="\n"),
+        file=paste("splits/",K,"fold/",i,"/test.txt",sep=""),sep="\n")
+}
+dir.create(paste("splits/",K,"fold/0",sep=""),showWarnings=FALSE)
+write(paste(0:(M-1),collapse="\n"),
+      file=paste("splits/",K,"fold/0/train.txt",sep=""))
+
