@@ -3,12 +3,21 @@
 case "$1" in
     init)
         chmod 755 pipeline/parallel
-        chmod 755 pipeline/utils/setup.r
         chmod 755 pipeline/utils/kv
         chmod 755 pipeline/methods/fm/bin/libFM
         chmod 755 pipeline/methods/vw/vw
-        mkdir config
-        ./pipeline/setup.r
+        for count in {0..5}
+        do
+            mkdir -p data/$count
+            mkdir -p logs/$count/train
+            mkdir -p logs/$count/test
+            mkdir -p predictions/$count/train
+            mkdir -p predictions/$count/test
+        done
+        mkdir -p config
+        touch config/queue
+        touch config/datasets
+        touch config/methods
         ;;
     status)
         cat queue
