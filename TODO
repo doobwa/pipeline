@@ -4,3 +4,12 @@ pipeline push
 - Allow some commands to be executed serially.
 - remote datalab: check ram usage
 - Figure out how to check usage for multiple machines faster.
+
+pipeline split
+- Save each feature file 
+
+pipeline compute feature x
+- recompute feature x for the current splits
+
+pipeline stage
+- figure out how to send a list of features to a given method
