@@ -16,8 +16,8 @@ arguments <- parse_args(parser, positional_arguments = TRUE)
 filename <- arguments$args
 K <- arguments$options$K
 
-x <- read.csv(filename)
-M <- nrow(x)
+M <- as.numeric(read.table(pipe(paste('wc -l',filename)))[1])
+
 cvsplit <- as.numeric(cut(1:M,K))
 dir.create(paste("splits/",K,"fold",sep=""),showWarnings=FALSE)
 for (i in K:1) {

@@ -14,6 +14,7 @@ case "$1" in
             mkdir -p predictions/$count/train
             mkdir -p predictions/$count/test
         done
+        mkdir -p splits
         mkdir -p features
         mkdir -p config
         touch config/queue
