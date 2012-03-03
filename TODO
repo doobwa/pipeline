@@ -14,7 +14,6 @@ pipeline compute feature x
 pipeline stage
 - figure out how to send a list of features to a given method
 
-
 kv
 - Rewrite / nix this in favor a JSON solution.
 - Add "get" and "in" commands.
@@ -38,3 +37,4 @@ Concurrent pipeline usage
 - How do we both work on a competition at the same time? Do we each have 
   separate copies of all the data, or do we just link to a shared 
   directory?
+
