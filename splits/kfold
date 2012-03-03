@@ -30,7 +30,7 @@ for (i in K:1) {
   write(paste(test.ix - 1,collapse="\n"),
         file=paste("splits/",K,"fold/",i,"/test.txt",sep=""),sep="\n")
 }
-dir.create(paste("splits/",K,"fold/0",sep=""),showWarnings=FALSE)
-write(paste(0:(M-1),collapse="\n"),
-      file=paste("splits/",K,"fold/0/train.txt",sep=""))
+#dir.create(paste("splits/",K,"fold/0",sep=""),showWarnings=FALSE)
+#write(paste(0:(M-1),collapse="\n"),
+#      file=paste("splits/",K,"fold/0/train.txt",sep=""))
 
