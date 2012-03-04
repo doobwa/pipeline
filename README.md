@@ -78,3 +78,28 @@ Each script in the `features/` folder should accept:
 `splits/`
 
 Each subdirectory is a particular type of cross-validation split.  For example `splits/5fold` is a type of cross-validation split that will have two subdirectories, `train` and `test`, containing a file for each feature that can be used.
+
+## Example
+
+A goal set of interactions:
+
+```bash
+# Create cross-validation splits
+pipeline split kfold 5 rawdata/training.csv
+
+# Compute all the features for all the splits
+pipeline compute all
+
+# Stage all the commands needed to run the gbm method (profile #5 as defined in config.json) on the dataset named basic_features.
+pipeline stage gbm 5 basic_features
+
+# Push all the commands to be processed in parallel on Amazon web services
+pipeline push aws
+
+# Check the status of staged commands in the queue, 
+pipeline status
+
+# Look at the progress over time for each method, feature, etc.  Evaluation metric defined on config.json.
+pipeline dashboard
+
+```
