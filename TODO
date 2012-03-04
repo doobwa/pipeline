@@ -37,4 +37,6 @@ Concurrent pipeline usage
 - How do we both work on a competition at the same time? Do we each have 
   separate copies of all the data, or do we just link to a shared 
   directory?
+    -- One option: have the (linked) shared directory defined in the config file.
 
+Unit testing of the above functionality
