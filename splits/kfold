@@ -26,11 +26,20 @@ for (i in K:1) {
   train.ix <- which(cvsplit != i)
   test.ix  <- which(cvsplit == i)
   write(paste(train.ix - 1,collapse="\n"),
-        file=paste("splits/",K,"fold/",i,"/train.txt",sep=""))
+        file=paste("splits/",K,"fold/",i,"/train.ind",sep=""))
   write(paste(test.ix - 1,collapse="\n"),
-        file=paste("splits/",K,"fold/",i,"/test.txt",sep=""),sep="\n")
+        file=paste("splits/",K,"fold/",i,"/test.ind",sep=""),sep="\n")
 }
-#dir.create(paste("splits/",K,"fold/0",sep=""),showWarnings=FALSE)
-#write(paste(0:(M-1),collapse="\n"),
-#      file=paste("splits/",K,"fold/0/train.txt",sep=""))
 
+for (i in K:1) {
+  outfile <- paste("splits/",K,"fold/",i,"/train.txt",sep="")
+  indices <- paste("splits/",K,"fold/",i,"/train.ind",sep="")
+  command <- paste("./pipeline/utils/filesplit.r --infile",filename,"--outfile",outfile,"--indices",indices)
+  system(command)
+}
+for (i in K:1) {
+  outfile <- paste("splits/",K,"fold/",i,"/test.txt",sep="")
+  indices <- paste("splits/",K,"fold/",i,"/test.ind",sep="")
+  command <- paste("./pipeline/utils/filesplit.r --infile",filename,"--outfile",outfile,"--indices",indices)
+  system(command)
+}

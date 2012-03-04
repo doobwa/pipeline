@@ -1,0 +1,11 @@
+infile <- tempfile()
+outfile <- tempfile()
+indices <- tempfile()
+write(paste(1:100,collapse="\n"),file=infile)
+write(paste(10:20,collapse="\n"),file=indices)
+command <- paste("./pipeline/utils/filesplit.r --infile",infile,"--outfile",outfile,"--indices",indices)
+system(command)
+a <- readLines(infile)
+b <- scan(indices)
+x <- scan(outfile)
+all(x==11:21) # TRUE

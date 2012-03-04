@@ -5,6 +5,7 @@ case "$1" in
         chmod 755 pipeline/parallel
         chmod 755 pipeline/stage.r
         chmod 755 pipeline/splits/*
+        chmod 755 utils/numjoin
         chmod 755 pipeline/methods/fm/bin/libFM
         chmod 755 pipeline/methods/vw/vw
         mkdir -p config
@@ -33,8 +34,8 @@ case "$1" in
 #        ;;
     compute)
 # TODO: do this for each split. save to data/[split]/#/[feature]
-        
         ./pipeline/features/$2 
+        ;;
     split) 
         ./pipeline/splits/$2 --K $3 $4
         ;;
