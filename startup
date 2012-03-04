@@ -2,3 +2,4 @@
 
 # Correct paths
 export PATH=`pwd`/pipeline:$PATH
+export PATH=`pwd`/pipeline/utils:$PATH

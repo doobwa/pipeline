@@ -9,12 +9,13 @@ A lightweight framework for data mining.
 
 If your new project is called `competition`:
 
+```bash
 mkdir competition
 cd competition
 git clone git@github.com:doobwa/pipeline.git
 source pipeline/startup
 pipeline init
-
+```
 
 ## Available commands
 `pipeline init`
@@ -25,6 +26,10 @@ Initializes a directory with the needed directory structure.
 `pipeline split kfold 5 [filename]`
 
 Executes splits/kfold.r with K=5 to the specified file (e.g. rawdata/training.csv).  Any script in the splits folder should create a folder in data with subfolders for each split, and further subfolders for train and test portions.
+
+`pipeline compute [feature]`
+
+Executes `features/[name]`, which should compute one (or more) column files for every available split in the `splits/` directory.
 
 `pipeline push [cluster]`
 
@@ -40,13 +45,6 @@ The training file is named `data/[split_name]/[split #]/train` and the test file
 By default, `method` and `dataset` are set to "all".  
 
 *status*: This cannot be completed until we know how to send a particular set of features to a method.
-
-`pipeline add dataset [dataset name]`
-Add a dataset to the list of datasets to be evaluated.
-
-`pipeline compute [feature]`
-
-Executes `features/[name]`, which should compute one (or more) column files for every available split in the `data/` directory.
 
 ## How it works
 

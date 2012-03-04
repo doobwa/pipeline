@@ -8,7 +8,9 @@
 suppressPackageStartupMessages(library("optparse"))
 
 option_list <- list(
-  make_option("--K", default=5, help="Number of cross validation folds.")
+  make_option("--K", default=5, help="Number of cross validation folds."),
+  make_option("--header", default=TRUE, help="")
+
 )
 parser <- OptionParser(usage = "%prog [options] datafile", option_list=option_list)
 arguments <- parse_args(parser, positional_arguments = TRUE)
@@ -17,29 +19,32 @@ filename <- arguments$args
 K <- arguments$options$K
 
 M <- as.numeric(read.table(pipe(paste('wc -l',filename)))[1])
-
-cvsplit <- as.numeric(cut(1:M,K))
+ix <- 1:M
+if (arguments$options$header) ix <- 2:M
+cvsplit <- as.numeric(cut(ix,K))
 dir.create(paste("splits/",K,"fold",sep=""),showWarnings=FALSE)
 for (i in K:1) {
   cat(".")
   dir.create(paste("splits/",K,"fold/",i,sep=""),showWarnings=FALSE)
+  dir.create(paste("splits/",K,"fold/",i,"/train",sep=""),showWarnings=FALSE)
+  dir.create(paste("splits/",K,"fold/",i,"/test",sep=""),showWarnings=FALSE)
   train.ix <- which(cvsplit != i)
   test.ix  <- which(cvsplit == i)
   write(paste(train.ix - 1,collapse="\n"),
-        file=paste("splits/",K,"fold/",i,"/train.ind",sep=""))
+        file=paste("splits/",K,"fold/",i,"/train/ind",sep=""))
   write(paste(test.ix - 1,collapse="\n"),
-        file=paste("splits/",K,"fold/",i,"/test.ind",sep=""),sep="\n")
+        file=paste("splits/",K,"fold/",i,"/test/ind",sep=""),sep="\n")
 }
 
 for (i in K:1) {
-  outfile <- paste("splits/",K,"fold/",i,"/train.txt",sep="")
-  indices <- paste("splits/",K,"fold/",i,"/train.ind",sep="")
+  outfile <- paste("splits/",K,"fold/",i,"/train/data",sep="")
+  indices <- paste("splits/",K,"fold/",i,"/train/ind",sep="")
   command <- paste("./pipeline/utils/filesplit.r --infile",filename,"--outfile",outfile,"--indices",indices)
   system(command)
 }
 for (i in K:1) {
-  outfile <- paste("splits/",K,"fold/",i,"/test.txt",sep="")
-  indices <- paste("splits/",K,"fold/",i,"/test.ind",sep="")
+  outfile <- paste("splits/",K,"fold/",i,"/test/data",sep="")
+  indices <- paste("splits/",K,"fold/",i,"/test/ind",sep="")
   command <- paste("./pipeline/utils/filesplit.r --infile",filename,"--outfile",outfile,"--indices",indices)
   system(command)
 }

@@ -29,9 +29,14 @@ for (i in 1:length(methods)) {
       for (split in splits) {
         js <- list.files(paste("splits/",split,sep=""))
         for (j in js) {
-          # cat(names(methods)[i],arg,dataset,split,j,"\n")
+          
+          # TODO: make train and test using named pipe with all features for this dataset.  Use `paste -d , [space-separated list of feature files]` to combine them.
+          
+          predictions.file <- ""
+          log.file <- ""
+          
           prog <- names(methods)[i]
-          entry <- paste("./pipeline/methods/",prog,"/",prog," ",arg," --dataset ",dataset," ...(MORE HERE)",sep="")
+          entry <- paste("./pipeline/methods/",prog,"/",prog," ",arg," --train pipe_train --test pipe_test --predictions ",predictions.file," --log ",log.file,sep="")
           write(entry,file="queue",append=TRUE)
         }
       }
