@@ -39,7 +39,7 @@ case "$1" in
         ./pipeline/splits/$2 --K $3 $4
         ;;
     stage) 
-        ./pipeline/stage.r --method "all" --dataset "all"
+        ./pipeline/stage.r --method $2 --dataset $3
         ;;
     push) 
         ./pipeline/remotes/datalab

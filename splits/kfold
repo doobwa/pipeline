@@ -23,11 +23,15 @@ ix <- 1:M
 if (arguments$options$header) ix <- 2:M
 cvsplit <- as.numeric(cut(ix,K))
 dir.create(paste("splits/",K,"fold",sep=""),showWarnings=FALSE)
+dir.create(paste("predictions/",K,"fold",sep=""),showWarnings=FALSE)
 for (i in K:1) {
   cat(".")
   dir.create(paste("splits/",K,"fold/",i,sep=""),showWarnings=FALSE)
   dir.create(paste("splits/",K,"fold/",i,"/train",sep=""),showWarnings=FALSE)
   dir.create(paste("splits/",K,"fold/",i,"/test",sep=""),showWarnings=FALSE)
+  dir.create(paste("predictions/",K,"fold/",i,sep=""),showWarnings=FALSE)
+  dir.create(paste("predictions/",K,"fold/",i,"/train",sep=""),showWarnings=FALSE)
+  dir.create(paste("predictions/",K,"fold/",i,"/test",sep=""),showWarnings=FALSE)
   train.ix <- which(cvsplit != i)
   test.ix  <- which(cvsplit == i)
   write(paste(train.ix - 1,collapse="\n"),

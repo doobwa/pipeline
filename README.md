@@ -1,9 +1,8 @@
 # pipeline
 
-Authors: Chris DuBois and Drew Frank
-Date: March 1, 2012
+A lightweight framework for predictive modeling.
 
-A lightweight framework for data mining.
+Authors: Chris DuBois and Drew Frank
 
 ## Installation
 
@@ -39,7 +38,7 @@ Executes the jobs in `queue` using GNU parallel.  (Currently only the `datalab` 
 
 `pipeline stage [method] [method.id] [dataset]`
 
-This adds a series of commands to the queue.  One may specify a particular method to be used via method, or a particular `dataset` to apply methods to.  If a method is specified, one may further specify the arguments of choice by providing a `method.id` (the position of the desired arguments in the list of arguments as found in the config.json file). 
+This adds a series of commands to the queue to fit and evaluate a series of methods on a series of datasets.  One may specify a particular `method` to be used via method, or a particular `dataset` to apply methods to.  If a method is specified, one may further specify the arguments of choice by providing a `method.id` (the position of the desired arguments in the list of arguments as found in the config.json file). 
 
 The training file is named `data/[split_name]/[split #]/train` and the test file  `data/[split_name]/[split #]/test`. (Both of these are constructed on the fly using a named pipe from the dataset's features as found in these split folders.)
 By default, `method` and `dataset` are set to "all".  
@@ -105,3 +104,14 @@ pipeline status
 pipeline dashboard
 
 ```
+
+## Contributing
+
+Adding new method wrappers (e.g. liblinear, etc) is always welcome.
+
+The preferred way of committing is:
+```
+git fetch origin
+git rebase -p origin/master
+``` 
+

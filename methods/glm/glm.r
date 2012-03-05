@@ -1,7 +1,9 @@
 #!/usr/bin/env Rscript
 suppressPackageStartupMessages(library("optparse"))
+suppressPackageStartupMessages(library("rjson"))
 
 option_list <- list(
+  make_option("--id", help=""),
   make_option("--train", help=""),
   make_option("--test", help=""),
   make_option("--predictions", help=""),
@@ -9,12 +11,14 @@ option_list <- list(
 )
 opts   <- parse_args(OptionParser(option_list=option_list))
 
-desc <- paste("glm",opts,sep="_")
-outfile <- paste("predictions/",opts$split,"/test/",desc,sep="")
-logfile <- paste("logs/",opts$split,"/test/",desc,sep="")
+config <- fromJSON(,"config.json")
 
-train <- read.csv()
-fit <- glm(y ~ .,family="binomial")
-yhat <- predict(fit,type="response",data=test)
+args <- config$method[['glm']]$args[[as.numeric(opts$id) + 1]]  # id uses 0-based
 
-# TODO: Write to file 
+desc <- paste("glm",opts$id,sep="_")
+
+train <- read.csv(opts$train)
+test  <- read.csv(opts$test)
+fit <- glm(response ~ .,family=args$family,data=train)
+yhat <- predict(fit,type="response",newdata=test)
+write(paste(yhat,collapse="\n"),file=opts$predictions)
