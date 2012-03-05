@@ -1,5 +1,10 @@
 TODO:
 
+Most important:
+- Change write to file to be a named pipe
+- Decide on how to handle method args in config.json
+- Allow pipeline stage to only stage chosen methods/datasets
+
 pipeline push
 - Allow some commands to be executed serially.
 - remote datalab: check ram usage

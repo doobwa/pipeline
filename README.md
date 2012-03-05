@@ -29,7 +29,7 @@ Executes splits/kfold.r with K=5 to the specified file (e.g. rawdata/training.cs
 
 `pipeline compute [feature]`
 
-Executes `features/[name]`, which should compute one (or more) column files for every available split in the `splits/` directory.
+Executes `features/[feature]`, which should compute one (or more) column files for every available split in the `splits/` directory.
 
 `pipeline push [cluster]`
 
@@ -81,7 +81,7 @@ Each subdirectory is a particular type of cross-validation split.  For example `
 
 ## Example
 
-A goal set of interactions:
+A typical pipeline session (once things are complete).
 
 ```bash
 # Create cross-validation splits
@@ -90,16 +90,18 @@ pipeline split kfold 5 rawdata/training.csv
 # Compute all the features for all the splits
 pipeline compute all
 
-# Stage all the commands needed to run the gbm method (profile #5 as defined in config.json) on the dataset named basic_features.
+# Stage all the commands needed to run the gbm method (profile #5 as defined 
+# in config.json) on the dataset named basic_features.
 pipeline stage gbm 5 basic_features
 
 # Push all the commands to be processed in parallel on Amazon web services
 pipeline push aws
 
-# Check the status of staged commands in the queue, 
+# Check the status of staged commands in the queue, etc.
 pipeline status
 
-# Look at the progress over time for each method, feature, etc.  Evaluation metric defined on config.json.
+# Look at the progress over time for each method, feature, etc.  Evaluation 
+# metric defined on config.json.
 pipeline dashboard
 
 ```

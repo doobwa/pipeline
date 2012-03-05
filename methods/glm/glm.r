@@ -13,6 +13,7 @@ desc <- paste("glm",opts,sep="_")
 outfile <- paste("predictions/",opts$split,"/test/",desc,sep="")
 logfile <- paste("logs/",opts$split,"/test/",desc,sep="")
 
+train <- read.csv()
 fit <- glm(y ~ .,family="binomial")
 yhat <- predict(fit,type="response",data=test)
 
