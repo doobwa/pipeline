@@ -32,25 +32,28 @@ for (i in 1:length(methods)) {
       for (split in splits) {
         js <- list.files(paste("splits/",split,sep=""))
         for (j in js) {
-          # TODO: make train and test using named pipe with all features for this dataset.  Use `paste -d , [space-separated list of feature files]` to combine them.
+          # TODO: make train and test using named pipe with all features for this dataset.
           
           coms <- c()
           features <- paste("splits/",split,"/",j,"/train/",dataset$features,sep="",collapse=" ")
           coms <- c(coms,paste("paste -d ,",features,"> train.tmp"))
-          features <- paste("splits/",split,"/",j,"/test/",dataset$features,sep="",collapse=" ")
+          if (split == "full") {  # evaluate training set instead of test set
+            features <- paste("splits/full/",j,"/train/",dataset$features,sep="",collapse=" ")
+          } else {
+            features <- paste("splits/",split,"/",j,"/test/",dataset$features,sep="",collapse=" ")     
+          }
           coms <- c(coms,paste("paste -d ,",features,"> test.tmp"))
           
-          # TODO: Improve handling of method arguments
           prog <- names(methods)[i]
-          desc <- paste(prog,id,sep="_")  # TODO: Need to fix description here
+          desc <- paste(prog,id,sep="_") 
           
           predictions.file <- paste("predictions/",split,"/",j,"/test/",desc,sep="")
           log.file <- paste("logs/",split,"/",j,"/test/",desc,sep="")
           
-          coms <- c(coms,paste("./pipeline/methods/",prog,"/",prog," --train train.tmp --test test.tmp --predictions ",predictions.file," --log ",log.file,sep=""))
+          coms <- c(coms,paste("./pipeline/methods/",prog,"/",prog," --train train.tmp --test test.tmp --predictions ",predictions.file," --log ",log.file," --id ",id,sep=""))
           
           for (m in dataset$metric) {
-            coms <- c(coms,paste("./pipeline/eval --predictions ",predictions.file," --truth splits/",split,"/",j,"/test/response"," --metric ",m," --logfile results --entry '",split,",",j,",",prog,",",id,"'",sep=""))
+            coms <- c(coms,paste("./pipeline/eval --predictions ",predictions.file," --truth splits/",split,"/",j,"/test/response"," --metric ",m," --logfile results.csv --entry '",split,",",j,",",prog,",",id,"'",sep=""))
           }
             
           commands <- paste(coms,sep=";\n")

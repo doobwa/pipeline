@@ -1,0 +1,52 @@
+#!/usr/bin/env Rscript
+
+# Creates a set of K-fold cross validation datasets for the supplied file,
+# e.g. a training set.  The row indices (0-based) are saved to text files
+# in splits/[k]fold/x for x = [0, ..., K].  The 0 split includes the entire 
+# training set.
+
+suppressPackageStartupMessages(library("optparse"))
+
+option_list <- list(
+make_option("--header", default=TRUE, help="Does data file have a header row")
+)
+parser <- OptionParser(usage = "%prog [options] train_file valid_file", option_list=option_list)
+arguments <- parse_args(parser, positional_arguments = TRUE)
+
+train_file <- arguments$args[1]
+valid_file <- arguments$args[2]
+
+dir.create(paste("splits/full",sep=""),showWarnings=FALSE)
+dir.create(paste("predictions/full",sep=""),showWarnings=FALSE)
+dir.create(paste("predictions/full/1",sep=""),showWarnings=FALSE)
+dir.create(paste("splits/full/1",sep=""),showWarnings=FALSE)
+dir.create(paste("splits/full/1/train",sep=""),showWarnings=FALSE)
+dir.create(paste("splits/full/1/test",sep=""),showWarnings=FALSE)
+
+M <- as.numeric(read.table(pipe(paste('wc -l',train_file)))[1])
+ix <- 1:M
+cvsplit <- rep(1,M)
+if (arguments$options$header) {
+  cvsplit[1] <- 0  # first row not assigned a split
+}
+train.ix <- which(cvsplit == 1)
+write(paste(train.ix - 1,collapse="\n"), file=paste("splits/full/1/train/ind",sep=""))
+
+outfile <- paste("splits/full/1/train/data",sep="")
+indices <- paste("splits/full/1/train/ind",sep="")
+command <- paste("./pipeline/utils/filesplit.r --infile",train_file,"--outfile",outfile,"--indices",indices)
+system(command)
+
+M <- as.numeric(read.table(pipe(paste('wc -l',valid_file)))[1])
+ix <- 1:M
+cvsplit <- rep(1,M)
+if (arguments$options$header) {
+  cvsplit[1] <- 0  # first row not assigned a split
+}
+valid.ix <- which(cvsplit == 1)
+write(paste(valid.ix - 1,collapse="\n"), file=paste("splits/full/test/ind",sep=""))
+
+outfile <- paste("splits/full/1/test/data",sep="")
+indices <- paste("splits/full/1/test/ind",sep="")
+command <- paste("./pipeline/utils/filesplit.r --infile",valid_file,"--outfile",outfile,"--indices",indices)
+system(command)

@@ -9,7 +9,8 @@ suppressPackageStartupMessages(library("optparse"))
 
 option_list <- list(
   make_option("--K", default=5, help="Number of cross validation folds."),
-  make_option("--header", default=TRUE, help="")
+  make_option("--random", default=TRUE, help="Randomize placementof rows into each fold"),
+  make_option("--header", default=TRUE, help="Does data file have a header row")
 
 )
 parser <- OptionParser(usage = "%prog [options] datafile", option_list=option_list)
@@ -20,8 +21,15 @@ K <- arguments$options$K
 
 M <- as.numeric(read.table(pipe(paste('wc -l',filename)))[1])
 ix <- 1:M
-if (arguments$options$header) ix <- 2:M
-cvsplit <- as.numeric(cut(ix,K))
+if (arguments$options$random) {
+  cvsplit <- sample(1:K,length(ix),replace=TRUE)
+} else {
+  cvsplit <- as.numeric(cut(ix,K))
+}
+if (arguments$options$header) {
+  cvsplit[1] <- 0  # first row not assigned a split
+}
+
 dir.create(paste("splits/",K,"fold",sep=""),showWarnings=FALSE)
 dir.create(paste("predictions/",K,"fold",sep=""),showWarnings=FALSE)
 for (i in K:1) {

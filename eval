@@ -12,14 +12,13 @@ option_list <- list(
 parser <- OptionParser(usage = "%prog [options] datafile", option_list=option_list)
 opts <- parse_args(parser, positional_arguments = TRUE)$options
 
-yhat <- scan(opts$predictions)
-y    <- scan(opts$truth)
+yhat <- scan(opts$predictions,skip=1)
+y    <- scan(opts$truth,skip=1)
 
-metric <- switch(opts$metric,
-   "rmse" = function(y,yhat) sqrt(mean((y-yhat)^2))
-)
+sourceDir("pipeline/metrics")
+metric <- get(opts$metric)
 
 res  <- metric(y,yhat)
 
-out <- paste(opts$entry,res,sep=",")
+out <- paste(opts$entry,opts$metric,res,sep=",")
 write(out,file=opts$logfile,append=TRUE)

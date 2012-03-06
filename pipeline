@@ -18,6 +18,7 @@ case "$1" in
     status)
         cat queue
         ;;
+# TODO: Have shortcuts for interacting with config.json (e.g.adding/removing)
 #    add)
 #        if [ "$2" == "dataset" ] ; then
 #            ./utils/kv add config/datasets "$3"
@@ -36,7 +37,7 @@ case "$1" in
         ./pipeline/compute.r --feature $2
         ;;
     split) 
-        ./pipeline/splits/$2 --K $3 $4
+        ./pipeline/splits/$2 --K $3 --random "false" $4 
         ;;
     stage) 
         ./pipeline/stage.r --method $2 --dataset $3

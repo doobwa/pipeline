@@ -34,16 +34,18 @@ Executes `features/[feature]`, which should compute one (or more) column files f
 
 Executes the jobs in `queue` using GNU parallel.  (Currently only the `datalab` cluster is implemented.)
 
-## Planned commands
+`pipeline stage [method] [dataset]`
 
-`pipeline stage [method] [method.id] [dataset]`
+This adds a series of commands to the queue to fit and evaluate a series of methods on a series of datasets.  One may specify a particular `method` to be used via method, or a particular `dataset` to apply methods to.  
 
-This adds a series of commands to the queue to fit and evaluate a series of methods on a series of datasets.  One may specify a particular `method` to be used via method, or a particular `dataset` to apply methods to.  If a method is specified, one may further specify the arguments of choice by providing a `method.id` (the position of the desired arguments in the list of arguments as found in the config.json file). 
+*planned* If a method is specified, one may further specify the arguments of choice by providing a `method.id` (the position of the desired arguments in the list of arguments as found in the config.json file). 
 
 The training file is named `data/[split_name]/[split #]/train` and the test file  `data/[split_name]/[split #]/test`. (Both of these are constructed on the fly using a named pipe from the dataset's features as found in these split folders.)
 By default, `method` and `dataset` are set to "all".  
 
 *status*: This cannot be completed until we know how to send a particular set of features to a method.
+
+`pipeline dashboard`
 
 ## How it works
 
@@ -71,6 +73,14 @@ Each script in the `features/` folder should accept:
   -- Features that are `dense` should save a csv file with a header row describing each column.
   -- Features that are `sparse` should be (roughly) in svm format, where each row is a space-sparated sequence of `[feature_name]:[feature_value]` pairs.
 
+## Script for creating submissions
+
+The `submit` file should be a script accepting:
+
+- `--infile`: file containing predictions
+- `--outfile`: desired location for submission-ready text file
+
+By convention, the outfile should be in the `submissions/` directory.
 
 ## Directory structure
 
