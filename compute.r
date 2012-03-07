@@ -6,7 +6,7 @@ option_list <- list(
 parser <- OptionParser(usage = "%prog [options]", option_list=option_list)
 opts   <- parse_args(OptionParser(option_list=option_list))
 
-if (is.null(opts$feature)) {
+if (is.null(opts$feature) | opts$feature=="all") {
   opts$feature <- list.files("features/")
 }
 

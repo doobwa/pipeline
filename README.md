@@ -24,7 +24,7 @@ Initializes a directory with the needed directory structure.
 
 (soon) `pipeline split full [filename]`
 
-`pipeline split kfold 5 [filename]`
+`pipeline split kfold [filename] [K]`
 
 Executes splits/kfold.r with K=5 to the specified file (e.g. rawdata/training.csv).  Any script in the splits folder should create a folder in data with subfolders for each split, and further subfolders for train and test portions.
 
@@ -55,6 +55,41 @@ A feature is computed on a given set of data and represents one or more columns 
 
 A dataset is a named colleciton of features.  When a method is executed for a particular dataset, the respective features are combined on the fly via a named pipe and the method's script is executed.
 
+## Example of `config.json`
+
+The following is an example of a simple `config.json` file.  It has a named data set called `basic` that has two features and a response, and is evaluated based on RMSE using two types of cross validation, 5fold and full.  (Full refers to using the entire training set and predicting on the validation set.  Unlike other splits, it requires two files: train and validation.)
+
+The `feature` element describes whether each of the available features is either 'dense' or 'sparse'.  Each feature corresponds to a file with identical name in the `features/` folder.  All features in this list will be computed via the command `pipeline compute`.
+
+The `method` element contains an array of methods to be considered.  The command `pipeline stage all [dataset]` uses all methods in this array.  Each method has a list of possible arguments.  Each unique method call is identified by its placement in this argument list, e.g. in the example below `glm 0` refers to the glm model where `family="gaussian"`.  The `data` attribute describes the types of `dataset` that this method can be applied to (though at this time no sanity checking is done).
+
+```json
+{
+    "dataset": {
+        "basic": {
+          "features": [
+              "response",
+              "feature1",
+              "feature2"
+          ], 
+          "splits": ["5fold","full"],
+          "metric": "rmse"
+        }
+    }, 
+    "feature": {
+      "response": "dense",
+      "feature1: "dense", 
+      "feature2: "dense"
+    }, 
+    "method": {
+      "glm": {
+        "args":[{"family":"gaussian"}],
+        "data":"basic"
+      }
+    }
+}
+```
+
 ## API
 
 ### Method scripts and wrappers
@@ -72,7 +107,7 @@ Each script in the `features/` folder should accept:
 
 - `--infile`: file used for computing the feature
 - `--outfile`: location to save the data. 
-  -- Features that are `dense` should save a csv file with a header row describing each column.
+  -- Features that are `dense` should save a csv file with a header row describing each column.n
   -- Features that are `sparse` should be (roughly) in svm format, where each row is a space-sparated sequence of `[feature_name]:[feature_value]` pairs.
 
 ### Script for creating submissions
@@ -92,21 +127,21 @@ Each subdirectory is a particular type of cross-validation split.  For example `
 
 ## Example
 
-A typical pipeline session (once things are complete).
+A typical pipeline session:
 
 ```bash
-# Create cross-validation splits
-pipeline split kfold 5 rawdata/training.csv
+# Create cross-validation splits with 5 folds
+pipeline split kfold rawdata/training.csv 5
 
 # Compute all the features for all the splits
 pipeline compute all
 
-# Stage all the commands needed to run the gbm method (profile #5 as defined 
+# Stage all the commands needed to run the gbm method (with argument sets defined 
 # in config.json) on the dataset named basic_features.
-pipeline stage gbm 5 basic_features
+pipeline stage gbm basic_features
 
-# Push all the commands to be processed in parallel on Amazon web services
-pipeline push aws
+# Push all the commands to be processed in parallel on datalab (eventually Amazon web services too)
+pipeline push datalab
 
 # Check the status of staged commands in the queue, etc.
 pipeline status

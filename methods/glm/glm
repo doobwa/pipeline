@@ -19,6 +19,10 @@ desc <- paste("glm",opts$id,sep="_")
 
 train <- read.csv(fifo(opts$train))
 test  <- read.csv(fifo(opts$test))
+
+# print(head(train))
+# print(head(test))
+
 fit <- glm(response ~ .,family=args$family,data=train)
 yhat <- predict(fit,type="response",newdata=test)
 out <- paste(yhat,collapse="\n")
