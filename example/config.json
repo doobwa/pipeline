@@ -1,0 +1,32 @@
+{
+    "dataset": {
+        "basic": {
+          "features": [
+              "response",
+              "essaylength"
+          ], 
+          "splits": ["5fold","full"],
+          "metric": "rmse"
+        }
+    }, 
+    "feature": {
+      "response": "dense",
+      "essaylength": "dense", 
+      "topics": "dense", 
+      "words": "sparse"
+    }, 
+    "method": {
+      "glm": {
+        "args":[{"family":"gaussian"}],
+        "data":"basic"
+      },
+        "logreg": {
+            "args": "", 
+            "data": "basic"
+        }, 
+        "slda": {
+          "args": [{"K":20},{"K":30}], 
+            "data": "basics"
+        }
+    }
+}

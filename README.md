@@ -22,6 +22,8 @@ Initializes a directory with the needed directory structure.
 
 `pipeline status`
 
+(soon) `pipeline split full [filename]`
+
 `pipeline split kfold 5 [filename]`
 
 Executes splits/kfold.r with K=5 to the specified file (e.g. rawdata/training.csv).  Any script in the splits folder should create a folder in data with subfolders for each split, and further subfolders for train and test portions.
@@ -73,7 +75,7 @@ Each script in the `features/` folder should accept:
   -- Features that are `dense` should save a csv file with a header row describing each column.
   -- Features that are `sparse` should be (roughly) in svm format, where each row is a space-sparated sequence of `[feature_name]:[feature_value]` pairs.
 
-## Script for creating submissions
+### Script for creating submissions
 
 The `submit` file should be a script accepting:
 
@@ -120,7 +122,8 @@ pipeline dashboard
 Adding new method wrappers (e.g. liblinear, etc) is always welcome.
 
 The preferred way of committing is:
-```
+
+```bash
 git fetch origin
 git rebase -p origin/master
 ``` 

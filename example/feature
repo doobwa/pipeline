@@ -1,0 +1,18 @@
+#!/usr/bin/env Rscript
+
+# Example of a script for computing a feature.  This one returns the response, y, for the given data file.
+
+suppressPackageStartupMessages(library("optparse"))
+option_list <- list(
+  make_option("--infile", help="Data file for computing feature."),
+  make_option("--outfile",help="Location to save feature file.")
+  )
+parser <- OptionParser(usage = "%prog [options]", option_list=option_list)
+opts   <- parse_args(OptionParser(option_list=option_list))
+
+d <- read.delim(opts$infile,quote="",comment.char="",header=FALSE)
+colnames(x) <- c("y","x1","x2")
+
+out <- paste(d$y,collapse="\n")
+out <- paste("\"response\"",out,sep="\n")
+write(out,file=opts$outfile)
