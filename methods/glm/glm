@@ -17,8 +17,8 @@ args <- config$method[['glm']]$args[[as.numeric(opts$id) + 1]]  # id uses 0-base
 
 desc <- paste("glm",opts$id,sep="_")
 
-train <- read.csv(opts$train)
-test  <- read.csv(opts$test)
+train <- read.csv(fifo(opts$train))
+test  <- read.csv(fifo(opts$test))
 fit <- glm(response ~ .,family=args$family,data=train)
 yhat <- predict(fit,type="response",newdata=test)
 out <- paste(yhat,collapse="\n")
