@@ -53,13 +53,8 @@ for (i in 1:length(methods)) {
           train.pipe <- paste(pipe.path,"/",pipe.base,".train",sep="")
           test.pipe <- paste(pipe.path,"/",pipe.base,".test",sep="")
         
-          # Handle the "full" split separately
           train.features <- paste("splits/",split,"/",j,"/train/",dataset$features,sep="",collapse=" ")
-          if (split == "full") {  # evaluate training set instead of test set
-            test.features <- paste("splits/full/",j,"/train/",dataset$features,sep="",collapse=" ")
-          } else {
-            test.features <- paste("splits/",split,"/",j,"/test/",dataset$features,sep="",collapse=" ")     
-          }
+          test.features <- paste("splits/",split,"/",j,"/test/",dataset$features,sep="",collapse=" ") 
           coms <- c(coms, paste("mkfifo ",train.pipe,sep=""))
           coms <- c(coms, paste("mkfifo ",test.pipe,sep=""))
 

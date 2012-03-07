@@ -1,0 +1,103 @@
+#!/usr/bin/env Rscript
+suppressPackageStartupMessages(library("optparse"))
+suppressPackageStartupMessages(library("rjson"))
+suppressPackageStartupMessages(library("gbm"))
+
+option_list <- list(
+  make_option("--id", help=""),
+  make_option("--train", help=""),
+  make_option("--test", help=""),
+  make_option("--predictions", help=""),
+  make_option("--log", help="")
+  )
+parser <- OptionParser(usage = "%prog [options]", option_list=option_list)
+opts   <- parse_args(OptionParser(option_list=option_list))
+
+#mkfifo splits/5fold/1/gbm_0_basic2.train; mkfifo splits/5fold/1/gbm_0_basic2.test; paste -d , splits/5fold/1/train/response splits/5fold/1/train/essaylength splits/5fold/1/train/set splits/5fold/1/train/is_domain2 >splits/5fold/1/gbm_0_basic2.train &; paste -d , splits/5fold/1/test/response splits/5fold/1/test/essaylength splits/5fold/1/test/set splits/5fold/1/test/is_domain2 >splits/5fold/1/gbm_0_basic2.test &;cat splits/5fold/1/gbm_0_basic2.train > temp.pipe 
+#opts <- list(train="temp.pipe",id=0)
+
+config <- fromJSON(,"config.json")
+
+args <- config$method[['gbm']]$args[[as.numeric(opts$id) + 1]]  # id uses 0-based indexing
+
+if (is.null(args$distribution)) {
+  args$distribution <- "bernoulli"
+}
+if (is.null(args$ntrees)) {
+  args$ntrees <- 500
+}
+if (is.null(args$final_trees)) {
+  args$final_trees <- 300
+}
+if (is.null(args$shrinkage)) {
+  args$shrinkage <- .005
+}
+if (is.null(args$interaction_depth)) {
+  args$interaction_depth <- 4
+}
+if (is.null(args$min_obs_per_node)) {
+  args$min_obs_per_node <- 10
+}
+if (is.null(args$bag_fraction)) {
+  args$bag_fraction <- .5
+}
+if (is.null(args$train_fraction)) {
+  args$train_fraction <- .5
+}
+if (is.null(args$train_fraction)) {
+  args$train_fraction <- .5
+}
+if (is.null(args$keep_data)) {
+  args$keep_data <- .5
+}
+if (is.null(args$cvfolds)) {
+  args$cvfolds <- 0
+}
+if (is.null(args$verbose)) {
+  args$verbose <- FALSE
+}
+#print(opts$id)
+#print(args)
+
+train <- read.csv(fifo(opts$train))
+test  <- read.csv(fifo(opts$test))
+
+y <- test$response
+test$response <- NULL
+
+#print(summary(train))
+
+train <- as.matrix(train)
+test <- as.matrix(test)
+
+# See vignette on use.
+# Prediction (and fitting?) requires converting covariates to full matrix, so tread carefully.
+y <- train[,1]
+x <- train[,-1]
+
+print(head(y))
+print(head(x))
+print(head(test))
+
+fit <- gbm.fit(x,y,
+               distribution=args$distribution,
+               n.trees=args$ntrees,
+               shrinkage=args$shrinkage,
+               interaction.depth=args$interaction_depth,
+               bag.fraction =args$bag_fraction,
+               train.fraction =args$train_fraction,
+               n.minobsinnode =args$min_obs_per_node,
+               var.names = colnames(x),
+               keep.data=args$keep_data,
+               verbose=args$verbose)
+
+best.iter <- gbm.perf(fit,method="OOB")
+cat("best iter:",best.iter,"\n")
+print(paste(opts$log,".rdata",sep=""))
+save(fit,best.iter,file=opts$log)
+yhat <- predict(fit,newdata=test,n.trees=best.iter,type="response")
+
+
+out <- paste(yhat,collapse="\n")
+out <- paste("\"predictions\"",out,sep="\n")
+write(out,file=opts$predictions)

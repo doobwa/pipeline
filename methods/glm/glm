@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 suppressPackageStartupMessages(library("optparse"))
 suppressPackageStartupMessages(library("rjson"))
+suppressPackageStartupMessages(library("arm"))
 
 option_list <- list(
   make_option("--id", help=""),
@@ -13,7 +14,7 @@ opts   <- parse_args(OptionParser(option_list=option_list))
 
 config <- fromJSON(,"config.json")
 
-args <- config$method[['glm']]$args[[as.numeric(opts$id) + 1]]  # id uses 0-based
+args <- config$method[['glm']]$args[[as.numeric(opts$id) + 1]]  # id uses 0-based indexing
 
 desc <- paste("glm",opts$id,sep="_")
 
@@ -23,8 +24,8 @@ test  <- read.csv(fifo(opts$test))
 # print(head(train))
 # print(head(test))
 
-fit <- glm(response ~ .,family=args$family,data=train)
+fit <- bayesglm(response ~ .*.,family=args$family,data=train)
 yhat <- predict(fit,type="response",newdata=test)
 out <- paste(yhat,collapse="\n")
-out <- paste("\"predictons\"",out,sep="\n")
+out <- paste("\"predictions\"",out,sep="\n")
 write(out,file=opts$predictions)

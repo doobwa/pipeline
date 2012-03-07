@@ -101,6 +101,8 @@ Each script in the `methods/` folder should accept arguments specific to that me
 - `--predictions`: filename for saving predictions for the test data
 - `--log`: filename for writing log data, if it exists
 
+The predictions file should begin with "predictions" and have a single prediction for each row.  This file should have the same number of lines as the provided test file.
+
 ### Scripts that create features
 
 Each script in the `features/` folder should accept:
@@ -156,7 +158,7 @@ pipeline dashboard
 
 Adding new method wrappers (e.g. liblinear, etc) is always welcome.
 
-The preferred way of committing is:
+The preferred way of updating your local repo before pushing to github is shown below.
 
 ```bash
 git fetch origin

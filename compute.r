@@ -24,6 +24,13 @@ for (s in splits) {
         cat(outfile,"\n")
       }
     }
+   # TODO: Sanity check that all feature files within a split have the same length
+   # sapply(list.files(paste("splits/",s,"/",j,sep="")),function(f) {
+   #   as.numeric(read.table(pipe(paste('wc -l',f)))[1])
+   #  })
+   # }
   }
 }
+
+
 cat("done\n")

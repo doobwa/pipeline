@@ -12,12 +12,19 @@ train_file <- arguments$args[1]
 valid_file <- arguments$args[2]
 
 dir.create(paste("splits/full",sep=""),showWarnings=FALSE)
-dir.create(paste("predictions/full",sep=""),showWarnings=FALSE)
-dir.create(paste("predictions/full/1",sep=""),showWarnings=FALSE)
 dir.create(paste("splits/full/1",sep=""),showWarnings=FALSE)
 dir.create(paste("splits/full/1/train",sep=""),showWarnings=FALSE)
 dir.create(paste("splits/full/1/test",sep=""),showWarnings=FALSE)
+dir.create(paste("predictions/full",sep=""),showWarnings=FALSE)
+dir.create(paste("predictions/full/1",sep=""),showWarnings=FALSE)
+dir.create(paste("predictions/full/1/train",sep=""),showWarnings=FALSE)
+dir.create(paste("predictions/full/1/test",sep=""),showWarnings=FALSE)
+dir.create(paste("logs/full",sep=""),showWarnings=FALSE)
+dir.create(paste("logs/full/1",sep=""),showWarnings=FALSE)
+dir.create(paste("logs/full/1/train",sep=""),showWarnings=FALSE)
+dir.create(paste("logs/full/1/test",sep=""),showWarnings=FALSE)
 
+# Write data and indices for training data
 M <- as.numeric(read.table(pipe(paste('wc -l',train_file)))[1])
 ix <- 1:M
 cvsplit <- rep(1,M)
@@ -31,6 +38,8 @@ outfile <- paste("splits/full/1/train/data",sep="")
 indices <- paste("splits/full/1/train/ind",sep="")
 command <- paste("./pipeline/utils/filesplit.r --infile",train_file,"--outfile",outfile,"--indices",indices)
 system(command)
+
+# Write data and indices for validation data
 
 M <- as.numeric(read.table(pipe(paste('wc -l',valid_file)))[1])
 ix <- 1:M

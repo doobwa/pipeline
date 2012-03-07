@@ -39,6 +39,9 @@ for (i in K:1) {
   dir.create(paste("predictions/",K,"fold/",i,sep=""),showWarnings=FALSE)
   dir.create(paste("predictions/",K,"fold/",i,"/train",sep=""),showWarnings=FALSE)
   dir.create(paste("predictions/",K,"fold/",i,"/test",sep=""),showWarnings=FALSE)
+  dir.create(paste("logs/",K,"fold/",i,sep=""),showWarnings=FALSE)
+  dir.create(paste("logs/",K,"fold/",i,"/train",sep=""),showWarnings=FALSE)
+  dir.create(paste("logs/",K,"fold/",i,"/test",sep=""),showWarnings=FALSE)
   train.ix <- which(cvsplit != i)
   test.ix  <- which(cvsplit == i)
   write(paste(train.ix - 1,collapse="\n"),
