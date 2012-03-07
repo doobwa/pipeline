@@ -1,10 +1,5 @@
 #!/usr/bin/env Rscript
 
-# Creates a set of K-fold cross validation datasets for the supplied file,
-# e.g. a training set.  The row indices (0-based) are saved to text files
-# in splits/[k]fold/x for x = [0, ..., K].  The 0 split includes the entire 
-# training set.
-
 suppressPackageStartupMessages(library("optparse"))
 
 option_list <- list(
@@ -44,7 +39,7 @@ if (arguments$options$header) {
   cvsplit[1] <- 0  # first row not assigned a split
 }
 valid.ix <- which(cvsplit == 1)
-write(paste(valid.ix - 1,collapse="\n"), file=paste("splits/full/test/ind",sep=""))
+write(paste(valid.ix - 1,collapse="\n"), file=paste("splits/full/1/test/ind",sep=""))
 
 outfile <- paste("splits/full/1/test/data",sep="")
 indices <- paste("splits/full/1/test/ind",sep="")

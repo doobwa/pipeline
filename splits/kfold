@@ -8,16 +8,15 @@
 suppressPackageStartupMessages(library("optparse"))
 
 option_list <- list(
-  make_option("--K", default=5, help="Number of cross validation folds."),
   make_option("--random", default=TRUE, help="Randomize placementof rows into each fold"),
   make_option("--header", default=TRUE, help="Does data file have a header row")
 
 )
-parser <- OptionParser(usage = "%prog [options] datafile", option_list=option_list)
+parser <- OptionParser(usage = "%prog [options] datafile K", option_list=option_list)
 arguments <- parse_args(parser, positional_arguments = TRUE)
 
-filename <- arguments$args
-K <- arguments$options$K
+filename <- arguments$args[1]
+K <- arguments$args[2]
 
 M <- as.numeric(read.table(pipe(paste('wc -l',filename)))[1])
 ix <- 1:M

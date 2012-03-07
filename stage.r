@@ -21,23 +21,30 @@ if (opts$method == "all") {
   names(methods) <- opts$method
 }
 
+# For each method
 for (i in 1:length(methods)) {
   method <- methods[[i]]
+
+  # For each set of arguments for the given method (which are identified by the method's "id").
   ids <- ifelse(is.null(opts$id), 0:(length(method$args)-1), opts$id)
   for (id in ids) {
+
+    # For each dataset we will apply the method to.  If user specifies "all", use all the datasets corresponding to 
+    # this method in the config file.
     datasets <- ifelse(opts$dataset == "all",
                        config$dataset[method$data],
                        config$dataset[opts$dataset])
     for (dataset in datasets) {
+
+      # For each split
       for (split in splits) {
         js <- list.files(paste("splits/",split,sep=""))
         for (j in js) {
           # Each method does training and prediction in the same call. So, start writing to both train and test 
           # pipes (in bg processes), then launch the command.
 
-          # TODO: Improve handling of method arguments
           prog <- names(methods)[i]
-          desc <- paste(prog,id,sep="_")  # TODO: Need to fix description here
+          desc <- paste(prog,id,sep="_")
           coms <- c()
           
           pipe.path <- paste("splits/",split,"/",j,sep="")
@@ -58,7 +65,7 @@ for (i in 1:length(methods)) {
 
           predictions.file <- paste("predictions/",split,"/",j,"/test/",desc,sep="")
           log.file <- paste("logs/",split,"/",j,"/test/",desc,sep="")
-          coms <- c(coms, paste("./pipeline/methods/",prog,"/",prog," --train train.tmp --test test.tmp --predictions ",predictions.file," --log ",log.file," --id ",id,sep=""))
+          coms <- c(coms, paste("./pipeline/methods/",prog,"/",prog," --train ",train.pipe," --test ",test.pipe," --predictions ",predictions.file," --log ",log.file," --id ",id,sep=""))
 
           coms <- c(coms, paste("rm ",train.pipe,sep=""))
           coms <- c(coms, paste("rm ",test.pipe,sep=""))
