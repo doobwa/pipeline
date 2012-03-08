@@ -44,4 +44,13 @@ Concurrent pipeline usage
   directory?
     -- One option: have the (linked) shared directory defined in the config file.
 
+Ensemble selection
+- Compute the best ensemble of methods using a held-out ensemble calibration dataset.
+- Pipeline split will need to generate the held-out dataset(s).
+- We need "methods" for computing the ensemble prediction (e.g. grid search, lasso, etc) 
+  that take individual method predictions as input and try to predict the actual response 
+  on the ensemble calibration data.
+    - It may be useful to use "soft" predictions from other methods as input here. This 
+      could be another use case for multiple columns in prediction files.
+
 Unit testing of the above functionality
