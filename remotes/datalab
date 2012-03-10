@@ -1,12 +1,15 @@
 #!/usr/bin/env Rscript
+suppressPackageStartupMessages(library("rjson"))
 # Execute commands in config/queue in parallel across datalab machines.  
 # Finds number of open cores for each machine and schedules accordingly.
+
+config <- fromJSON(,"config.json")
 
 # This looks potentially relevant to what we're trying to do here.
 # http://www.gnu.org/software/parallel/man.html#example__gnu_parallel_as_queue_system_batch_manager
 
 # For each datalab machine
-hosts <- paste("d",12:5,sep="")  # prefer newer datalabs
+hosts <- paste("d",c(12:10,8:5),sep="")  # prefer newer datalabs
 require(multicore)
 number.used <- unlist(mclapply(hosts, function(h) {
   command <- paste('ssh ',h,' \"ps -eo pcpu,pid,user | sort -r | head -9\" ',sep='')
@@ -24,4 +27,6 @@ number.used <- unlist(mclapply(hosts, function(h) {
 # I've seen it vary from what top reports for long running processes.
 
 remotes <- paste(8-number.used,hosts,sep="/",collapse=",")
-system(paste("cat config/queue | ./pipeline/parallel --sshlogin",remotes))
+command <- paste("cd ",config$path,"; cat queue | ./pipeline/parallel --sshlogin",remotes)
+print(command)
+system(command)

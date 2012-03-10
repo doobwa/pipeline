@@ -1,10 +1,13 @@
 #!/usr/bin/env Rscript
 suppressPackageStartupMessages(library("optparse"))
+suppressPackageStartupMessages(library("rjson"))
 option_list <- list(
   make_option("--feature", help="")
   )
 parser <- OptionParser(usage = "%prog [options]", option_list=option_list)
 opts   <- parse_args(OptionParser(option_list=option_list))
+
+config <- fromJSON(,"config.json")
 
 if (is.null(opts$feature) | opts$feature=="all") {
   opts$feature <- list.files("features/")
@@ -19,9 +22,8 @@ for (s in splits) {
       for (k in c("train","test")) {
         infile <- paste("splits/",s,"/",j,"/",k,"/data",sep="")
         outfile <- paste("splits/",s,"/",j,"/",k,"/",f,sep="")
-        command <- paste("features/",f," --infile ",infile," --outfile ",outfile,sep="") 
-        system(command)
-        cat(outfile,"\n")
+        command <- paste("cd ",config$path,"; ./features/",f," --infile ",infile," --outfile ",outfile,sep="") 
+        write(command,file="queue",append=TRUE)
       }
     }
    # TODO: Sanity check that all feature files within a split have the same length

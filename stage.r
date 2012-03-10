@@ -46,7 +46,7 @@ for (i in 1:length(methods)) {
 
           prog <- names(methods)[i]
           desc <- paste(prog,id,names(datasets)[d],sep="_")
-          coms <- c()
+          coms <- paste("cd ",config$path,sep="")
           
           pipe.path <- paste("splits/",split,"/",j,sep="")
           pipe.base <- paste(desc,sep="_") # Should be unique to this particular run.
