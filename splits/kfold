@@ -43,7 +43,7 @@ for (i in K:1) {
   dir.create(paste("logs/",K,"fold/",i,"/train",sep=""),showWarnings=FALSE)
   dir.create(paste("logs/",K,"fold/",i,"/test",sep=""),showWarnings=FALSE)
   train.ix <- which(cvsplit != i)
-  test.ix  <- which(cvsplit == i)
+  test.ix  <- which(cvsplit %in% c(0,i))
   write(paste(train.ix - 1,collapse="\n"),
         file=paste("splits/",K,"fold/",i,"/train/ind",sep=""))
   write(paste(test.ix - 1,collapse="\n"),
