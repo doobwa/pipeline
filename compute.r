@@ -19,8 +19,14 @@ for (s in splits) {
       for (k in c("train","test")) {
         infile <- paste("splits/",s,"/",j,"/",k,"/data",sep="")
         outfile <- paste("splits/",s,"/",j,"/",k,"/",f,sep="")
-        command <- paste("features/",f," --infile ",infile," --outfile ",outfile,sep="") 
-        system(command)
+        if (s == "full" && f == "response" && k == "test") {
+          # We can't compute the response on the actual test set, so just 
+          # write a file with a header and no data.
+          writeLines('response', outfile)
+        } else {
+          command <- paste("features/",f," --infile ",infile," --outfile ",outfile,sep="") 
+          system(command)
+        }
         cat(outfile,"\n")
       }
     }
