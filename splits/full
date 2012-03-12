@@ -3,6 +3,7 @@
 suppressPackageStartupMessages(library("optparse"))
 
 option_list <- list(
+make_option("--random", default=TRUE, help="Randomize placement of rows in the train file"),
 make_option("--header", default=TRUE, help="Does data file have a header row")
 )
 parser <- OptionParser(usage = "%prog [options] train_file valid_file", option_list=option_list)
@@ -26,12 +27,18 @@ dir.create(paste("logs/full/1/test",sep=""),showWarnings=FALSE)
 
 # Write data and indices for training data
 M <- as.numeric(read.table(pipe(paste('wc -l',train_file)))[1])
-ix <- 1:M
-cvsplit <- rep(1,M)
 if (arguments$options$header) {
-  cvsplit[1] <- 0  # first row not assigned a split
+    train.ix <- 2:M
+    M <- M - 1
+} else {
+    train.ix <- 1:M
 }
-train.ix <- which(cvsplit == 1)
+if (arguments$options$random) {
+    train.ix <- sample(train.ix, M, replace=FALSE)
+}
+if (arguments$options$header) {
+    train.ix <- c(1, train.ix)
+}
 write(paste(train.ix - 1,collapse="\n"), file=paste("splits/full/1/train/ind",sep=""))
 
 outfile <- paste("splits/full/1/train/data",sep="")
@@ -42,12 +49,7 @@ system(command)
 # Write data and indices for validation data
 
 M <- as.numeric(read.table(pipe(paste('wc -l',valid_file)))[1])
-ix <- 1:M
-cvsplit <- rep(1,M)
-if (arguments$options$header) {
-  cvsplit[1] <- 0  # first row not assigned a split
-}
-valid.ix <- which(cvsplit == 1)
+valid.ix <- 1:M
 write(paste(valid.ix - 1,collapse="\n"), file=paste("splits/full/1/test/ind",sep=""))
 
 outfile <- paste("splits/full/1/test/data",sep="")
