@@ -13,6 +13,10 @@ option_list <- list(
 opts   <- parse_args(OptionParser(option_list=option_list))
 
 config <- fromJSON(,"config.json")
+formula <- config$method[['glm']]$formula
+if (is.null(formula)) {
+    formula <- 'response ~ .'
+}
 
 args <- config$method[['glm']]$args[[as.numeric(opts$id) + 1]]  # id uses 0-based indexing
 
@@ -21,10 +25,7 @@ desc <- paste("glm",opts$id,sep="_")
 train <- read.csv(fifo(opts$train))
 test  <- read.csv(fifo(opts$test))
 
-# print(head(train))
-# print(head(test))
-
-fit <- bayesglm(response ~ .*.,family=args$family,data=train)
+fit <- bayesglm(as.formula(formula),family=args$family,data=train)
 yhat <- predict(fit,type="response",newdata=test)
 out <- paste(yhat,collapse="\n")
 out <- paste("\"predictions\"",out,sep="\n")
