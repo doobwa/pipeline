@@ -63,6 +63,8 @@ The `feature` element describes whether each of the available features is either
 
 The `method` element contains an array of methods to be considered.  The command `pipeline stage all [dataset]` uses all methods in this array.  Each method has a list of possible arguments.  Each unique method call is identified by its placement in this argument list, e.g. in the example below `glm 0` refers to the glm model where `family="gaussian"`.  The `data` attribute describes the types of `dataset` that this method can be applied to (though at this time no sanity checking is done).
 
+The "basic" dataset below specifies the optional "pred_transform" file. This will cause the predictions written by the method to be stored in a file with a ".raw" suffix, which will then be processed by the transform script (scripts/unscale in this case) and written to the usual location.
+
 ```json
 {
     "dataset": {
@@ -73,13 +75,14 @@ The `method` element contains an array of methods to be considered.  The command
               "feature2"
           ], 
           "splits": ["5fold","full"],
-          "metric": "rmse"
+          "metric": "rmse",
+          "pred_transform": "unscale"
         }
     }, 
     "feature": {
       "response": "dense",
-      "feature1: "dense", 
-      "feature2: "dense"
+      "feature1": "dense", 
+      "feature2": "dense"
     }, 
     "method": {
       "glm": {
