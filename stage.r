@@ -14,10 +14,16 @@ opts <- parse_args(parser, positional_arguments = TRUE)$options
 config <- fromJSON(,"config.json")
 splits <- list.files("splits")
 
+method.id <- NULL
 if (opts$method == "all") {
   methods <- config$method
 } else {
-  methods <- config$method[opts$method]
+  method.arg <- strsplit(opts$method, ":")[[1]]
+  method.name <- method.arg[1]
+  if (length(method.arg) > 1) {
+    method.id <- method.arg[2]
+  }
+  methods <- config$method[method.name]
   names(methods) <- opts$method
 }
 
@@ -26,10 +32,10 @@ for (i in 1:length(methods)) {
   method <- methods[[i]]
 
   # For each set of arguments for the given method (which are identified by the method's "id").
-  if (is.null(opts$id)) {
+  if (is.null(method.id)) {
     ids <- 0:(length(method$args)-1)
   } else {
-    ids <- opts$id
+    ids <- method.id
   }
   for (id in ids) {
 
