@@ -59,8 +59,8 @@ for (i in 1:length(methods)) {
           coms <- c(coms, paste("mkfifo ",test.pipe,sep=""))
 
           # TODO: The way features are glued together should depend on whether the method or features are dense or sparse
-          coms <- c(coms, paste("paste -d , ",train.features," >",train.pipe," &",sep=""))
-          coms <- c(coms, paste("paste -d , ",test.features," >",test.pipe," &",sep=""))
+          coms <- c(coms, paste("(paste -d , ",train.features," >",train.pipe," &) 2>/dev/null",sep=""))
+          coms <- c(coms, paste("(paste -d , ",test.features," >",test.pipe," &) 2>/dev/null",sep=""))
 
           predictions.file <- paste("predictions/",split,"/",j,"/test/",desc,sep="")
           log.file <- paste("logs/",split,"/",j,"/test/",desc,sep="")
