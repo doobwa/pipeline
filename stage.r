@@ -26,7 +26,11 @@ for (i in 1:length(methods)) {
   method <- methods[[i]]
 
   # For each set of arguments for the given method (which are identified by the method's "id").
-  ids <- ifelse(is.null(opts$id), 0:(length(method$args)-1), opts$id)
+  if (is.null(opts$id)) {
+    ids <- 0:(length(method$args)-1)
+  } else {
+    ids <- opts$id
+  }
   for (id in ids) {
 
     # For each dataset we will apply the method to.  If user specifies "all", use all the datasets corresponding to this method in the config file.
