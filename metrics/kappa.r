@@ -1,3 +1,19 @@
+essays <- function(a, b, aux) {
+  kappas <- c()
+  # Compute all domain_1 kappas.
+  for (essay_set in 1:8) {
+    ind <- aux$essay_set == essay_set & aux$domain == 1
+    kappas <- c(kappas, ScoreQuadraticWeightedKappa(a[ind], b[ind]))
+  }
+  # Compute the domain_2 kappa for set 2.
+  ind <- aux$domain == 2
+  kappas <- c(kappas, ScoreQuadraticWeightedKappa(a[ind], b[ind]))
+
+  # Return the mean weighted kappa.
+  weights <- c(1,.5,1,1,1,1,1,1,.5)
+  MeanQuadraticWeightedKappa(kappas, weights)
+}
+
 ScoreQuadraticWeightedKappa = function (rater.a , rater.b, 
                                         min.rating,
                                         max.rating) {
