@@ -13,12 +13,12 @@ option_list <- list(
 opts   <- parse_args(OptionParser(option_list=option_list))
 
 config <- fromJSON(,"config.json")
-formula <- config$method[['glm']]$formula
+args <- config$method[['glm']]$args[[as.numeric(opts$id) + 1]]  # id uses 0-based indexing
+
+formula <- args$formula
 if (is.null(formula)) {
     formula <- 'response ~ .'
 }
-
-args <- config$method[['glm']]$args[[as.numeric(opts$id) + 1]]  # id uses 0-based indexing
 
 desc <- paste("glm",opts$id,sep="_")
 
