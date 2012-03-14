@@ -77,8 +77,12 @@ for (i in 1:length(methods)) {
           }
 
           # TODO: Handle "full" dataset separately?
+          aux.str <- ""
+          if (!is.null(dataset$eval_aux)) {
+            aux.str <- paste(" --aux ","splits/",split,"/",j,"/test/",dataset$eval_aux,sep="")
+          }
           for (m in dataset$metric) {
-            coms <- c(coms, paste("./pipeline/eval --predictions ",predictions.file," --truth splits/",split,"/",j,"/test/response"," --metric ",m," --logfile results.csv --entry '",names(datasets)[d],",",split,",",j,",",prog,",",id,"'",sep=""))
+            coms <- c(coms, paste("./pipeline/eval --predictions ",predictions.file," --truth splits/",split,"/",j,"/test/response",aux.str," --metric ",m," --logfile results.csv --entry '",names(datasets)[d],",",split,",",j,",",prog,",",id,"'",sep=""))
           }
           
           # Group all commands into a single ;-separated string to ensure they 
