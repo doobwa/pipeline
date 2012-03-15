@@ -24,7 +24,7 @@ if (opts$method == "all") {
     method.id <- method.arg[2]
   }
   methods <- config$method[method.name]
-  names(methods) <- opts$method
+  names(methods) <- method.name
 }
 
 # For each method
