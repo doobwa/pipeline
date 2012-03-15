@@ -40,11 +40,13 @@ for (i in 1:length(methods)) {
   for (id in ids) {
 
     # For each dataset we will apply the method to.  If user specifies "all", use all the datasets corresponding to this method in the config file.
-    datasets <- ifelse(opts$dataset == "all",
-                       config$dataset[method$data],
-                       config$dataset[opts$dataset])
-    names(datasets) <- ifelse(opts$dataset == "all",
-                              method$data,opts$dataset)
+    if (opts$dataset == "all") {
+      datasets <- config$dataset[method$data]
+      names(datasets) <- method$data
+    } else {
+      datasets <- config$dataset[opts$dataset]
+      names(datasets) <- opts$dataset
+    }
     for (d in 1:length(datasets)) {
       dataset <- datasets[[d]]
 
