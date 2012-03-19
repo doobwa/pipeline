@@ -13,8 +13,8 @@ option_list <- list(
 parser <- OptionParser(usage = "%prog [options] datafile", option_list=option_list)
 opts <- parse_args(parser, positional_arguments = TRUE)$options
 
-yhat <- scan(opts$predictions,skip=1)
-y    <- scan(opts$truth,skip=1)
+yhat <- scan(opts$predictions,skip=1,quiet=TRUE)
+y    <- scan(opts$truth,skip=1,quiet=TRUE)
 
 sourceDir("pipeline/metrics")
 metric <- get(opts$metric)
