@@ -1,29 +1,5 @@
 TODO:
 
-Most important:
-- Change write to file to be a named pipe
-- Decide on how to handle method args in config.json
-- Allow pipeline stage to only stage chosen methods/datasets
-
-pipeline push
-- Allow some commands to be executed serially.
-- remote datalab: check ram usage
-- Figure out how to check usage for multiple machines faster.
-
-pipeline split
-- Save each feature file 
-
-pipeline compute feature x
-- recompute feature x for the current splits
-
-pipeline stage
-- figure out how to send a list of features to a given method
-
-kv
-- Rewrite / nix this in favor a JSON solution.
-- Add "get" and "in" commands.
-- Add some error checking and write stuff to stderr.
-
 (GNU) parallel
 - We may want to use the following options: 
     --eta and/or --progress: could be useful for setting up a dashboard.
@@ -44,4 +20,17 @@ Concurrent pipeline usage
   directory?
     -- One option: have the (linked) shared directory defined in the config file.
 
-Unit testing of the above functionality
+Ensemble selection
+- Compute the best ensemble of methods using a held-out ensemble calibration dataset.
+- Pipeline split will need to generate the held-out dataset(s).
+- We need "methods" for computing the ensemble prediction (e.g. grid search, lasso, etc) 
+  that take individual method predictions as input and try to predict the actual response 
+  on the ensemble calibration data.
+    - It may be useful to use "soft" predictions from other methods as input here. This 
+      could be another use case for multiple columns in prediction files.
+
+Unit testing
+
+CLI for editing config.json
+- Add "get" and "in" commands.
+- Add some error checking and write stuff to stderr.

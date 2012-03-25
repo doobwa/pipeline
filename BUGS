@@ -1,0 +1,4 @@
+KNOWN BUGS
+
+- stage.r ignores the splits value in config.json
+

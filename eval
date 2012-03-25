@@ -5,6 +5,7 @@ suppressPackageStartupMessages(library("optparse"))
 option_list <- list(
   make_option("--predictions", help="Filename for predictions."),
   make_option("--truth", help="Filename for true values.  (Same length as predictions file.)"),
+  make_option("--aux", help="Auxiliary features needed to compute the evaluation metric."),
   make_option("--metric", help="Metric to compute."),
   make_option("--logfile", help="File to output result."),
   make_option("--entry", help="Description for this result as a comma-separated string.  This script appends the result to this entry and writes it to the logfile.  For the pipeline, the custom is to use [split],[split_number],[method_name],[method_args_number].")
@@ -12,13 +13,18 @@ option_list <- list(
 parser <- OptionParser(usage = "%prog [options] datafile", option_list=option_list)
 opts <- parse_args(parser, positional_arguments = TRUE)$options
 
-yhat <- scan(opts$predictions,skip=1)
-y    <- scan(opts$truth,skip=1)
+yhat <- scan(opts$predictions,skip=1,quiet=TRUE)
+y    <- scan(opts$truth,skip=1,quiet=TRUE)
 
 sourceDir("pipeline/metrics")
 metric <- get(opts$metric)
 
-res  <- metric(y,yhat)
+if (!is.null(opts$aux)) {
+    aux <- read.csv(opts$aux)
+    res  <- metric(y,yhat,aux)
+} else {
+    res  <- metric(y,yhat)
+}
 
 out <- paste(opts$entry,opts$metric,res,sep=",")
 write(out,file=opts$logfile,append=TRUE)
