@@ -27,9 +27,9 @@ xtest  <- read.csv(fifo(opts$test))
 y <- x$response
 
 if (is.null(args$regression)) {
-    args$regression <- "FALSE"
+    args$regression <- FALSE
 }
-if (args$regression == "FALSE") {
+if (!args$regression) {
     y <- factor(y)
 }
 x$response <- NULL
