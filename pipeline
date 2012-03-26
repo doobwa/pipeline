@@ -34,7 +34,7 @@ case "$1" in
 #        fi
 #        ;;
     compute)
-        ./pipeline/compute.r --feature $2
+        ./pipeline/compute.r --feature $2 --split $3
         ;;
     split) 
         ./pipeline/splits/$2 $3 $4

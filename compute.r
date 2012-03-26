@@ -2,7 +2,8 @@
 suppressPackageStartupMessages(library("optparse"))
 suppressPackageStartupMessages(library("rjson"))
 option_list <- list(
-  make_option("--feature", help="")
+  make_option("--feature", help=""),
+  make_option("--split", help="")
   )
 parser <- OptionParser(usage = "%prog [options]", option_list=option_list)
 opts   <- parse_args(OptionParser(option_list=option_list))
@@ -12,8 +13,11 @@ config <- fromJSON(,"config.json")
 if (is.null(opts$feature) | opts$feature=="all") {
   opts$feature <- list.files("features/")
 }
+if (is.null(opts$split) | opts$split=="all") {
+  opts$split <- list.files("splits/")
+}
 
-splits <- list.files("splits/")
+splits <- opts$split
 for (s in splits) {
   subsplits <- list.files(paste("splits/",s,sep=""))
   for (j in subsplits) {
