@@ -37,17 +37,13 @@ Executes `features/[feature]`, which should compute one (or more) column files f
 Executes the jobs in `queue` using GNU parallel.  (Currently only the `datalab` cluster is implemented.)
 
 `pipeline stage [method] [dataset]`
+`pipeline stage [method]:[method.id] [dataset]`
 
 This adds a series of commands to the queue to fit and evaluate a series of methods on a series of datasets.  One may specify a particular `method` to be used via method, or a particular `dataset` to apply methods to.  
 
-*planned* If a method is specified, one may further specify the arguments of choice by providing a `method.id` (the position of the desired arguments in the list of arguments as found in the config.json file). 
+If a method is specified, one may further specify the arguments of choice by providing a `method.id` (the position of the desired arguments in the list of arguments as found in the config.json file). 
 
 The training file is named `data/[split_name]/[split #]/train` and the test file  `data/[split_name]/[split #]/test`. (Both of these are constructed on the fly using a named pipe from the dataset's features as found in these split folders.)
-By default, `method` and `dataset` are set to "all".  
-
-*status*: This cannot be completed until we know how to send a particular set of features to a method.
-
-`pipeline dashboard`
 
 ## How it works
 
@@ -76,13 +72,14 @@ The "basic" dataset below specifies the optional "pred_transform" file. This wil
           ], 
           "splits": ["5fold","full"],
           "metric": "rmse",
-          "pred_transform": "unscale"
+          "pred_transform": "unscale",
+          "eval_aux": "id_features"
         }
     }, 
     "feature": {
       "response": "dense",
       "feature1": "dense", 
-      "feature2": "dense"
+      "feature2": "sparse"
     }, 
     "method": {
       "glm": {
@@ -104,6 +101,8 @@ Each script in the `methods/` folder should accept arguments specific to that me
 - `--predictions`: filename for saving predictions for the test data
 - `--log`: filename for writing log data, if it exists
 
+Any other arguments that are needed should be pulled from `config.json`.
+
 The predictions file should begin with "predictions" and have a single prediction for each row.  This file should have the same number of lines as the provided test file.
 
 ### Scripts that create features
@@ -124,11 +123,25 @@ The `submit` file should be a script accepting:
 
 By convention, the outfile should be in the `submissions/` directory.
 
+### Script for transforming predictions
+
+In some contexts it is helpful to do post-processing on a set of predictions.  The name of this script should be added to a `pred_transform` field of a dataset in `config.json`.  
+
+- `--infile`: file containing predictions
+- `--aux`: file pointing to additional features needed for performing the transform
+- `--outfile`: desired location for new predictions
+
+By default, the `--aux` parameter is populated using the `eval_aux` in `config.json`, if available.
+
 ## Directory structure
 
 `splits/`
 
 Each subdirectory is a particular type of cross-validation split.  For example `splits/5fold` is a type of cross-validation split that will have two subdirectories, `train` and `test`, containing a file for each feature that can be used.
+
+`predictions/`
+
+This directory mimics the structure of `splits/`, but the files are predictions made on the given split.  Files are named according to the method, the method id, and the `dataset` used (as described in the config file).
 
 ## Example
 
