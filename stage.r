@@ -81,18 +81,18 @@ for (i in 1:length(methods)) {
           coms <- c(coms, paste("rm ",train.pipe,sep=""))
           coms <- c(coms, paste("rm ",test.pipe,sep=""))
 
-          pred_transform <- dataset$pred_transform
-          if (!is.null(pred_transform)) {
-            raw.file <- paste(predictions.file,".raw",sep="")
-            coms <- c(coms, paste("mv",predictions.file,raw.file))
-            coms <- c(coms, paste("scripts/",pred_transform," --infile ",raw.file," --outfile ",predictions.file,sep=""))
-          }
-
-          # TODO: Handle "full" dataset separately?
           aux.str <- ""
           if (!is.null(dataset$eval_aux)) {
             aux.str <- paste(" --aux ","splits/",split,"/",j,"/test/",dataset$eval_aux,sep="")
           }
+
+          pred_transform <- dataset$pred_transform
+          if (!is.null(pred_transform)) {
+            raw.file <- paste(predictions.file,".raw",sep="")
+            coms <- c(coms, paste("mv",predictions.file,raw.file))
+            coms <- c(coms, paste("scripts/",pred_transform," --infile ",raw.file,aux.str," --outfile ",predictions.file,sep=""))
+          }
+
           for (m in dataset$metric) {
             coms <- c(coms, paste("./pipeline/eval --predictions ",predictions.file," --truth splits/",split,"/",j,"/test/response",aux.str," --metric ",m," --logfile results.csv --entry '",names(datasets)[d],",",split,",",j,",",prog,",",id,"'",sep=""))
           }
@@ -106,3 +106,4 @@ for (i in 1:length(methods)) {
     }
   }
 }
+
