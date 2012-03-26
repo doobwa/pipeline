@@ -67,6 +67,8 @@ for (i in 1:length(methods)) {
         
           train.features <- paste("splits/",split,"/",j,"/train/",dataset$features,sep="",collapse=" ")
           test.features <- paste("splits/",split,"/",j,"/test/",dataset$features,sep="",collapse=" ") 
+          coms <- c(coms, paste("if [ -e ",train.pipe," ]; then ","rm ",train.pipe," ]; fi",sep=""))
+          coms <- c(coms, paste("if [ -e ",train.pipe," ]; then ","rm ",train.pipe," ]; fi",sep=""))
           coms <- c(coms, paste("mkfifo ",train.pipe,sep=""))
           coms <- c(coms, paste("mkfifo ",test.pipe,sep=""))
 
