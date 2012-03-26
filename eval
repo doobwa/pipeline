@@ -16,14 +16,19 @@ opts <- parse_args(parser, positional_arguments = TRUE)$options
 yhat <- scan(opts$predictions,skip=1,quiet=TRUE)
 y    <- scan(opts$truth,skip=1,quiet=TRUE)
 
-sourceDir("pipeline/metrics")
-metric <- get(opts$metric)
-
-if (!is.null(opts$aux)) {
+# If (as in the case of the full test set), we may have no true labels y, so return NA.
+# Otherwise compute metric (with auxilary info if needed).
+if (length(y) == 0) {
+  res <- NA
+} else {
+  sourceDir("pipeline/metrics")
+  metric <- get(opts$metric)
+  if (!is.null(opts$aux)) {
     aux <- read.csv(opts$aux)
     res  <- metric(y,yhat,aux)
-} else {
+  } else {
     res  <- metric(y,yhat)
+  }
 }
 
 out <- paste(opts$entry,opts$metric,res,sep=",")
