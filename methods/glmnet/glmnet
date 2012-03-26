@@ -1,0 +1,58 @@
+#!/usr/bin/env Rscript
+suppressPackageStartupMessages(library("optparse"))
+suppressPackageStartupMessages(library("rjson"))
+suppressPackageStartupMessages(library("multicore"))
+suppressPackageStartupMessages(library("glmnet"))
+
+option_list <- list(
+  make_option("--id", help=""),
+  make_option("--train", help=""),
+  make_option("--test", help=""),
+  make_option("--predictions", help=""),
+  make_option("--log", help="")
+)
+opts <- parse_args(OptionParser(option_list=option_list))
+
+config <- fromJSON(,"config.json")
+
+# Required args: alpha, nlambda, s
+args <- config$method[['glmnet']]$args[[as.numeric(opts$id) + 1]]  # id uses 0-based indexing
+
+desc <- paste("glmnet",opts$id,sep="_")
+
+#cd /extra/duboisc0/essays; mkfifo train.pipe; paste -d , splits/5fold/1/train/allwords >train.pipe &; cd /extra/duboisc0/essays; mkfifo test.pipe; paste -d , splits/5fold/1/train/allwords >test.pipe &;
+#opts <- list(id=0,train="train.pipe",test="test.pipe",predictions="tmp.predictions.txt",log="tmp.log.txt") # Debug
+
+con <- fifo(opts$train)
+open(con)
+train.raw <- readLines(con)
+con <- fifo(opts$test)
+open(con)
+test.raw  <- readLines(con)
+
+options(cores=2)
+source("pipeline/utils/convert.r")
+train <- vw2edgelist(train.raw)
+y.train <- vw2response(train.raw)
+test  <- vw2edgelist(test.raw)
+y.test  <- vw2response(test.raw)
+D <- max(c(train[,2],test[,2]))
+
+m.train <- Matrix(0,nrow=length(train.raw),ncol=D)
+m.train[train[,1:2]] <- train[,3]
+m.test  <- Matrix(0,nrow=length(test.raw), ncol=D)
+m.test[test[,1:2]] <- test[,3]
+
+fit1 <- glmnet(m.train,y.train,alpha=args$alpha,nlambda=args$nlambda)
+
+# If interested in estimated parameters:
+# print(fit1)
+# beta <- coef(fit1,s=0.01) # extract coefficients at a single value of lambda
+# ix <- which(beta!=0)
+# load("working.data/allwords.rdata");data.frame(allwords[ix],beta[ix])
+
+yhat <- predict(fit1,newx=m.test,s=args$s) # make predictions
+     
+out <- paste(yhat,collapse="\n")
+out <- paste("\"predictions\"",out,sep="\n")
+write(out,file=opts$predictions)
