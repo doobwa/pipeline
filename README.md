@@ -86,6 +86,17 @@ The "basic" dataset below specifies the optional "pred_transform" file. This wil
         "args":[{"family":"gaussian"}],
         "data":"basic"
       }
+    },
+    "ensemble": {
+      "average":{
+        "combos" :[
+          ["random_forest_0_basic4","glm_0_basic4"] 
+        ],
+        "splits": ["5fold","full"],
+        "metric": ["rmse","essays_long"],
+        "eval_aux": "set_domain",
+        "pred_transform": "round_truncate"
+      }
     }
 }
 ```

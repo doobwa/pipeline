@@ -1,0 +1,80 @@
+#!/usr/bin/env Rscript
+
+suppressPackageStartupMessages(library("optparse"))
+suppressPackageStartupMessages(library("rjson"))
+
+option_list <- list(
+  make_option("--type", help="")
+)
+parser <- OptionParser(usage = "%prog [options] datafile", option_list=option_list)
+opts <- parse_args(parser, positional_arguments = TRUE)$options
+
+config <- fromJSON(,"config.json")
+splits <- list.files("splits")
+
+# TODO: Create a script in ensemble folder for this
+ensemble_average <- function(files,output.file) {
+  yhats <- lapply(files,function(f) scan(f,skip=1,quiet=TRUE))
+  yhat <- rowMeans(do.call(cbind,yhats))
+  out <- paste(yhat,collapse="\n")
+  out <- paste("\"predictions\"",out,sep="\n")
+  write(out,file=output.file)
+}
+
+# Get list of models to combine.  Some settings temporarily hard coded.
+#if (is.null(opts$type)) {}
+opts$type <- "average"
+opts$id <- 0
+id <- 0
+desc <- paste(opts$type,"_",opts$id,sep="")
+ensemble <- config$ensemble[[opts$type]]
+fs <- ensemble$combos[[1]]
+ensemble.name <- names(config$ensemble)
+
+# For each split
+for (split in splits) {
+  js <- list.files(paste("splits/",split,sep=""))
+  for (j in js) {
+    coms <- paste("cd ",config$path,sep="")
+    predictions.train.file <- paste("predictions/",split,"/",j,"/train/",desc,sep="")
+    predictions.test.file <- paste("predictions/",split,"/",j,"/test/",desc,sep="")
+
+    # Get lists of prediction files to combine
+    train.fs <- paste("predictions/",split,"/",j,"/train/",fs,sep="")
+    test.fs <- paste("predictions/",split,"/",j,"/test/",fs,sep="")
+
+    # Write out combined predictions
+    # TODO: Should instead add commands to queue that call the appropriate ensemble script.
+    ensemble_average(train.fs,predictions.train.file)
+    ensemble_average(test.fs,predictions.test.file)
+
+    # Prepare for evaluation with auxilary data, if necessary
+    aux.train <- aux.test <- ""
+    if (!is.null(ensemble$eval_aux)) {
+      aux.train <- paste(" --aux ","splits/",split,"/",j,"/train/",ensemble$eval_aux,sep="")
+      aux.test  <- paste(" --aux ","splits/",split,"/",j,"/test/",ensemble$eval_aux,sep="")
+    }
+
+    # Add evaluation commands to queue
+    pred_transform <- ensemble$pred_transform
+    if (!is.null(pred_transform)) {
+      raw.train.file <- paste(predictions.train.file,".raw",sep="")
+      raw.test.file  <- paste(predictions.test.file,".raw",sep="")
+      coms <- c(coms, paste("mv",predictions.train.file,raw.train.file))
+      coms <- c(coms, paste("mv",predictions.test.file,raw.test.file))
+      coms <- c(coms, paste("scripts/",pred_transform," --infile ",raw.train.file,aux.train," --outfile ",predictions.train.file,sep=""))
+      coms <- c(coms, paste("scripts/",pred_transform," --infile ",raw.test.file,aux.test," --outfile ",predictions.test.file,sep=""))
+    }
+
+    for (m in ensemble$metric) {
+      coms <- c(coms, paste("./pipeline/eval --predictions ",predictions.train.file," --truth splits/",split,"/",j,"/train/response",aux.train," --metric ",m," --logfile results.csv --entry '",ensemble.name,",",split,",",j,",",id,",train'",sep=""))
+      coms <- c(coms, paste("./pipeline/eval --predictions ",predictions.test.file," --truth splits/",split,"/",j,"/test/response",aux.test," --metric ",m," --logfile results.csv --entry '",ensemble.name,",",split,",",j,",",id,",test'",sep=""))
+    }
+
+    # Group all commands into a single ;-separated string to ensure they 
+    # end up on the same server and are executed sequentially.
+    commands <- paste(coms,collapse="; ")
+    write(commands,file="queue",append=TRUE)
+  }
+}
+

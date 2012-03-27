@@ -45,6 +45,9 @@ case "$1" in
     push) 
         ./pipeline/remotes/datalab
         ;;
+    ensemble)
+        ./pipeline/ensemble
+        ;;
     *)
         echo "usage: $0 { }"
         ;;
