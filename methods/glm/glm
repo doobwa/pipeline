@@ -7,7 +7,8 @@ option_list <- list(
   make_option("--id", help=""),
   make_option("--train", help=""),
   make_option("--test", help=""),
-  make_option("--predictions", help=""),
+  make_option("--predictionsTrain", help=""),
+  make_option("--predictionsTest", help=""),
   make_option("--log", help="")
 )
 opts   <- parse_args(OptionParser(option_list=option_list))
@@ -26,7 +27,13 @@ train <- read.csv(fifo(opts$train))
 test  <- read.csv(fifo(opts$test))
 
 fit <- bayesglm(as.formula(formula),family=args$family,data=train)
+
+yhat <- predict(fit,type="response",newdata=train)
+out <- paste(yhat,collapse="\n")
+out <- paste("\"predictions\"",out,sep="\n")
+write(out,file=opts$predictionsTrain)
+
 yhat <- predict(fit,type="response",newdata=test)
 out <- paste(yhat,collapse="\n")
 out <- paste("\"predictions\"",out,sep="\n")
-write(out,file=opts$predictions)
+write(out,file=opts$predictionsTest)

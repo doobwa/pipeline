@@ -9,7 +9,8 @@ option_list <- list(
   make_option("--id", help=""),
   make_option("--train", help=""),
   make_option("--test", help=""),
-  make_option("--predictions", help=""),
+  make_option("--predictionsTrain", help=""),
+  make_option("--predictionsTest", help=""),
   make_option("--log", help="")
   )
 parser <- OptionParser(usage = "%prog [options]", option_list=option_list)
@@ -62,8 +63,13 @@ res <- randomForest(x, y, xtest,
     nodesize=args$nodesize,
     do.trace=args$do.trace
 )
-yhat <- res$test$predicted
 
+yhat <- res$test$predicted
 out <- paste(yhat,collapse="\n")
 out <- paste("prediction",out,sep="\n")
-write(out,file=opts$predictions)
+write(out,file=opts$predictionsTest)
+
+yhat <- res$predicted
+out <- paste(yhat,collapse="\n")
+out <- paste("prediction",out,sep="\n")
+write(out,file=opts$predictionsTrain)

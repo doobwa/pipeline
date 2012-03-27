@@ -76,27 +76,33 @@ for (i in 1:length(methods)) {
           coms <- c(coms, paste("(paste -d , ",train.features," >",train.pipe," &) 2>/dev/null",sep=""))
           coms <- c(coms, paste("(paste -d , ",test.features," >",test.pipe," &) 2>/dev/null",sep=""))
 
-          predictions.file <- paste("predictions/",split,"/",j,"/test/",desc,sep="")
+          predictions.train.file <- paste("predictions/",split,"/",j,"/train/",desc,sep="")
+          predictions.test.file <- paste("predictions/",split,"/",j,"/test/",desc,sep="")
           log.file <- paste("logs/",split,"/",j,"/test/",desc,sep="")
-          coms <- c(coms, paste("./pipeline/methods/",prog,"/",prog," --train ",train.pipe," --test ",test.pipe," --predictions ",predictions.file," --log ",log.file," --id ",id,sep=""))
+          coms <- c(coms, paste("./pipeline/methods/",prog,"/",prog," --train ",train.pipe," --test ",test.pipe," --predictionsTrain ",predictions.train.file," --predictionsTest ",predictions.test.file," --log ",log.file," --id ",id,sep=""))
 
           coms <- c(coms, paste("rm ",train.pipe,sep=""))
           coms <- c(coms, paste("rm ",test.pipe,sep=""))
 
-          aux.str <- ""
+          aux.train <- aux.test <- ""
           if (!is.null(dataset$eval_aux)) {
-            aux.str <- paste(" --aux ","splits/",split,"/",j,"/test/",dataset$eval_aux,sep="")
+            aux.train <- paste(" --aux ","splits/",split,"/",j,"/train/",dataset$eval_aux,sep="")
+            aux.test  <- paste(" --aux ","splits/",split,"/",j,"/test/",dataset$eval_aux,sep="")
           }
 
           pred_transform <- dataset$pred_transform
           if (!is.null(pred_transform)) {
-            raw.file <- paste(predictions.file,".raw",sep="")
-            coms <- c(coms, paste("mv",predictions.file,raw.file))
-            coms <- c(coms, paste("scripts/",pred_transform," --infile ",raw.file,aux.str," --outfile ",predictions.file,sep=""))
+            raw.train.file <- paste(predictions.train.file,".raw",sep="")
+            raw.test.file  <- paste(predictions.test.file,".raw",sep="")
+            coms <- c(coms, paste("mv",predictions.train.file,raw.train.file))
+            coms <- c(coms, paste("mv",predictions.test.file,raw.test.file))
+            coms <- c(coms, paste("scripts/",pred_transform," --infile ",raw.train.file,aux.train," --outfile ",predictions.train.file,sep=""))
+            coms <- c(coms, paste("scripts/",pred_transform," --infile ",raw.test.file,aux.test," --outfile ",predictions.test.file,sep=""))
           }
 
           for (m in dataset$metric) {
-            coms <- c(coms, paste("./pipeline/eval --predictions ",predictions.file," --truth splits/",split,"/",j,"/test/response",aux.str," --metric ",m," --logfile results.csv --entry '",names(datasets)[d],",",split,",",j,",",prog,",",id,"'",sep=""))
+            coms <- c(coms, paste("./pipeline/eval --predictions ",predictions.train.file," --truth splits/",split,"/",j,"/train/response",aux.train," --metric ",m," --logfile results.csv --entry '",names(datasets)[d],",",split,",",j,",",prog,",",id,",train'",sep=""))
+            coms <- c(coms, paste("./pipeline/eval --predictions ",predictions.test.file," --truth splits/",split,"/",j,"/test/response",aux.test," --metric ",m," --logfile results.csv --entry '",names(datasets)[d],",",split,",",j,",",prog,",",id,",test'",sep=""))
           }
           
           # Group all commands into a single ;-separated string to ensure they 
