@@ -96,14 +96,16 @@ The "basic" dataset below specifies the optional "pred_transform" file. This wil
 
 Each script in the `methods/` folder should accept arguments specific to that method as well as:
 
+- `--id`: identifier for the set of arguments to use
 - `--train`: filename for the training data to be used
 - `--test`: filename for the test data
-- `--predictions`: filename for saving predictions for the test data
+- `--predictionsTrain`: filename for saving predictions for the training data
+- `--predictionsTest`: filename for saving predictions for the test data
 - `--log`: filename for writing log data, if it exists
 
 Any other arguments that are needed should be pulled from `config.json`.
 
-The predictions file should begin with "predictions" and have a single prediction for each row.  This file should have the same number of lines as the provided test file.
+The predictions file created by this script should begin with "predictions" and have a single prediction for each row.  This file should have the same number of lines as the provided test file.
 
 ### Scripts that create features
 
