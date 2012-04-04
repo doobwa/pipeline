@@ -1,5 +1,15 @@
 TODO:
 
+Allow methods to be applied to portions of the training set
+- Follow the example of pred_transform, and have a file in a project's scripts/ folder.
+- Input: train pipe, test pipe, method, method.id, aux, predictionsTrain, predictionsTest, log
+- idea: can use aux to fit the method to different parts of the data separately
+- things it will place on queue: 
+  - creates new pipes that only include portions of the data
+  - fit methods to each portion and send to different predictions files
+  - combine predictions files
+- if a dataset mentions a mixer, then it is evaluated both with the mixer and without
+
 (GNU) parallel
 - We may want to use the following options: 
     --eta and/or --progress: could be useful for setting up a dashboard.
