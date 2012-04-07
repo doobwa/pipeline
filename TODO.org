@@ -1,6 +1,4 @@
-TODO:
-
-Allow methods to be applied to portions of the training set
+* Allow methods to be applied to portions of the training set
 - Follow the example of pred_transform, and have a file in a project's scripts/ folder.
 - Input: train pipe, test pipe, method, method.id, aux, predictionsTrain, predictionsTest, log
 - idea: can use aux to fit the method to different parts of the data separately
@@ -10,7 +8,7 @@ Allow methods to be applied to portions of the training set
   - combine predictions files
 - if a dataset mentions a mixer, then it is evaluated both with the mixer and without
 
-(GNU) parallel
+* (GNU) parallel
 - We may want to use the following options: 
     --eta and/or --progress: could be useful for setting up a dashboard.
     --joblog: also for dashboard.
@@ -24,13 +22,13 @@ Allow methods to be applied to portions of the training set
     --use-cpus-instead-of-cores: not sure if we need this, but it's 
       potentially relevant.
 
-Concurrent pipeline usage
+* Concurrent pipeline usage
 - How do we both work on a competition at the same time? Do we each have 
   separate copies of all the data, or do we just link to a shared 
   directory?
     -- One option: have the (linked) shared directory defined in the config file.
 
-Ensemble selection
+* Ensemble selection
 - Compute the best ensemble of methods using a held-out ensemble calibration dataset.
 - Pipeline split will need to generate the held-out dataset(s).
 - We need "methods" for computing the ensemble prediction (e.g. grid search, lasso, etc) 
@@ -39,8 +37,10 @@ Ensemble selection
     - It may be useful to use "soft" predictions from other methods as input here. This 
       could be another use case for multiple columns in prediction files.
 
-Unit testing
-
-CLI for editing config.json
+* Unit testing
+- [ ] Have example folder include a sample project so that we can do
+  integration testing on it.
+- [ ] Need to be able to call pipeline from inside pipeline folder
+* CLI for editing config.json
 - Add "get" and "in" commands.
 - Add some error checking and write stuff to stderr.
