@@ -1,4 +1,5 @@
 KNOWN BUGS
 
-- stage.r ignores the splits value in config.json
+- [ ] stage.r ignores the splits value in config.json
+- [ ] stage.r doesn't check to see if splits are present and dies silently
 
