@@ -52,14 +52,13 @@ for (i in 1:length(methods)) {
 
       # For each split
       for (split in splits) {
-        js <- list.files(paste("splits/",split,sep=""))
+        js <- list.files(paste("splits/",split,sep=""));
         for (j in js) {
           # Each method does training and prediction in the same call. So, start writing to both train and test pipes (in bg processes), then launch the command.
-
           prog <- names(methods)[i]
           desc <- paste(prog,id,names(datasets)[d],sep="_")
           coms <- paste("cd ",config$path,sep="")
-          
+
           pipe.path <- paste("splits/",split,"/",j,sep="")
           pipe.base <- paste(desc,sep="_") # Should be unique to this particular run.
           train.pipe <- paste(pipe.path,"/",pipe.base,".train",sep="")
@@ -79,8 +78,12 @@ for (i in 1:length(methods)) {
           predictions.train.file <- paste("predictions/",split,"/",j,"/train/",desc,sep="")
           predictions.test.file <- paste("predictions/",split,"/",j,"/test/",desc,sep="")
           log.file <- paste("logs/",split,"/",j,"/test/",desc,sep="")
-          coms <- c(coms, paste("./pipeline/methods/",prog,"/",prog," --train ",train.pipe," --test ",test.pipe," --predictionsTrain ",predictions.train.file," --predictionsTest ",predictions.test.file," --log ",log.file," --id ",id,sep=""))
 
+          create.commands <- coms
+          
+          fit.commands <- paste("./pipeline/methods/",prog,"/",prog," --train ",train.pipe," --test ",test.pipe," --predictionsTrain ",predictions.train.file," --predictionsTest ",predictions.test.file," --log ",log.file," --id ",id,sep="")
+
+          coms <- c()
           coms <- c(coms, paste("rm ",train.pipe,sep=""))
           coms <- c(coms, paste("rm ",test.pipe,sep=""))
 
@@ -104,10 +107,16 @@ for (i in 1:length(methods)) {
             coms <- c(coms, paste("./pipeline/eval --predictions ",predictions.train.file," --truth splits/",split,"/",j,"/train/response",aux.train," --metric ",m," --logfile results.csv --entry '",names(datasets)[d],",",split,",",j,",",prog,",",id,",train'",sep=""))
             coms <- c(coms, paste("./pipeline/eval --predictions ",predictions.test.file," --truth splits/",split,"/",j,"/test/response",aux.test," --metric ",m," --logfile results.csv --entry '",names(datasets)[d],",",split,",",j,",",prog,",",id,",test'",sep=""))
           }
-          
+
+          eval.commands <- coms
+
+          # Save commands needed to create all the pipes and evaluate the prediction files.  Should be useful when fitting models interactively.
+          debug.file <- "debug.rdata"
+          save(create.commands,fit.commands,eval.commands,prog,train.pipe,test.pipe,predictions.train.file,predictions.test.file,log.file,id,file=debug.file)
+
           # Group all commands into a single ;-separated string to ensure they 
           # end up on the same server and are executed sequentially.
-          commands <- paste(coms,collapse="; ")
+          commands <- paste(c(create.commands,fit.commands,eval.commands),collapse="; ")
           write(commands,file="queue",append=TRUE)
         }
       }

@@ -2,18 +2,17 @@
 
 case "$1" in
     init)
+        mkdir -p data
+        mkdir -p features
+        mkdir -p logs
+        mkdir -p predictions
+        mkdir -p splits
         chmod 755 pipeline/parallel
         chmod 755 pipeline/stage.r
         chmod 755 pipeline/splits/*
         chmod 755 pipeline/utils/numjoin
         chmod 755 pipeline/methods/fm/bin/libFM
         chmod 755 pipeline/methods/vw/vw
-        mkdir -p config
-        mkdir -p data
-        mkdir -p features
-        mkdir -p logs
-        mkdir -p predictions
-        mkdir -p splits
         ;;
     status)
         cat queue
