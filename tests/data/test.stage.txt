@@ -1,0 +1,15 @@
+if [ -e splits/2fold/1/glm_0_basic.train ]
+then rm splits/2fold/1/glm_0_basic.train ]
+fi
+if [ -e splits/2fold/1/glm_0_basic.train ]
+then rm splits/2fold/1/glm_0_basic.train ]
+fi
+mkfifo splits/2fold/1/glm_0_basic.train
+mkfifo splits/2fold/1/glm_0_basic.test
+(paste -d , splits/2fold/1/train/response splits/2fold/1/train/essaylength >splits/2fold/1/glm_0_basic.train &) 2>/dev/null
+(paste -d , splits/2fold/1/test/response splits/2fold/1/test/essaylength >splits/2fold/1/glm_0_basic.test &) 2>/dev/null
+./pipeline/methods/glm/glm --train splits/2fold/1/glm_0_basic.train --test splits/2fold/1/glm_0_basic.test --predictionsTrain predictions/2fold/1/train/glm_0_basic --predictionsTest predictions/2fold/1/test/glm_0_basic --log logs/2fold/1/test/glm_0_basic --id 0
+rm splits/2fold/1/glm_0_basic.train
+rm splits/2fold/1/glm_0_basic.test
+./pipeline/eval --predictions predictions/2fold/1/train/glm_0_basic --truth splits/2fold/1/train/response --metric rmse --logfile results.csv --entry 'basic,2fold,1,glm,0,train'
+./pipeline/eval --predictions predictions/2fold/1/test/glm_0_basic --truth splits/2fold/1/test/response --metric rmse --logfile results.csv --entry 'basic,2fold,1,glm,0,test'
