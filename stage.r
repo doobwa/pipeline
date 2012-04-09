@@ -11,9 +11,14 @@ option_list <- list(
 parser <- OptionParser(usage = "%prog [options] datafile", option_list=option_list)
 opts <- parse_args(parser, positional_arguments = TRUE)$options
 
+# Load mixer functions
+source("pipeline/mixers.r")
+
+# Read configuration file
 config <- fromJSON(,"config.json")
 splits <- list.files("splits")
 
+# Get method
 method.id <- NULL
 if (opts$method == "all") {
   methods <- config$method
@@ -50,20 +55,28 @@ for (i in 1:length(methods)) {
     for (d in 1:length(datasets)) {
       dataset <- datasets[[d]]
 
+      # Find out which mixer to use for this data set (and possibly the auxilary file needed for this)
+      if (is.null(dataset$mixer)) dataset$mixer <- "default"
+      mixer <- switch(dataset$mixer,
+                      "default" = mixer_default,
+                      "by_aux"  = mixer_byaux)
+      aux <- dataset$mixer_aux
+
       # For each split
       for (split in splits) {
         js <- list.files(paste("splits/",split,sep=""));
         for (j in js) {
+          
           # Each method does training and prediction in the same call. So, start writing to both train and test pipes (in bg processes), then launch the command.
           prog <- names(methods)[i]
           desc <- paste(prog,id,names(datasets)[d],sep="_")
-          coms <- paste("cd ",config$path,sep="")
 
+          # Get commands needed to create pipes and fit method
           pipe.path <- paste("splits/",split,"/",j,sep="")
           pipe.base <- paste(desc,sep="_") # Should be unique to this particular run.
           train.pipe <- paste(pipe.path,"/",pipe.base,".train",sep="")
           test.pipe <- paste(pipe.path,"/",pipe.base,".test",sep="")
-        
+          
           train.features <- paste("splits/",split,"/",j,"/train/",dataset$features,sep="",collapse=" ")
           test.features <- paste("splits/",split,"/",j,"/test/",dataset$features,sep="",collapse=" ") 
           coms <- c(coms, paste("if [ -e ",train.pipe," ]; then ","rm ",train.pipe," ]; fi",sep=""))
@@ -71,7 +84,7 @@ for (i in 1:length(methods)) {
           coms <- c(coms, paste("mkfifo ",train.pipe,sep=""))
           coms <- c(coms, paste("mkfifo ",test.pipe,sep=""))
 
-          # TODO: The way features are glued together should depend on whether the method or features are dense or sparse
+          ## TODO: The way features are glued together should depend on whether the method or features are dense or sparse
           coms <- c(coms, paste("(paste -d , ",train.features," >",train.pipe," &) 2>/dev/null",sep=""))
           coms <- c(coms, paste("(paste -d , ",test.features," >",test.pipe," &) 2>/dev/null",sep=""))
 
@@ -86,6 +99,9 @@ for (i in 1:length(methods)) {
           coms <- c()
           coms <- c(coms, paste("rm ",train.pipe,sep=""))
           coms <- c(coms, paste("rm ",test.pipe,sep=""))
+
+          # Mixer
+          ./pipeline/mixer/byaux --train train.pipe --test test.pipe --aux --predictionsTrain predictions.train.file  
 
           aux.train <- aux.test <- ""
           if (!is.null(dataset$eval_aux)) {
