@@ -57,6 +57,7 @@ for (i in 1:length(methods)) {
           # Each method does training and prediction in the same call. So, start writing to both train and test pipes (in bg processes), then launch the command.
           prog <- names(methods)[i]
           desc <- paste(prog,id,names(datasets)[d],sep="_")
+#          coms <- c()
           coms <- paste("cd ",config$path,sep="")
 
           pipe.path <- paste("splits/",split,"/",j,sep="")
@@ -87,20 +88,26 @@ for (i in 1:length(methods)) {
           coms <- c(coms, paste("rm ",train.pipe,sep=""))
           coms <- c(coms, paste("rm ",test.pipe,sep=""))
 
+        
+          # Loop through available transforms if any are present
+          pred_transform <- dataset$pred_transform
+          if (!is.null(pred_transform)) {
+            for (pt in pred_transform) {
+              raw.train.file <- paste(predictions.train.file,".raw",sep="")
+              raw.test.file  <- paste(predictions.test.file,".raw",sep="")
+              coms <- c(coms, paste("mv",predictions.train.file,raw.train.file))
+              coms <- c(coms, paste("mv",predictions.test.file,raw.test.file))
+              aux.train <- paste("splits/",split,"/",j,"/train/",pt$aux,sep="")
+              aux.test  <- paste("splits/",split,"/",j,"/test/",pt$aux,sep="")
+              coms <- c(coms, paste("scripts/",pt$name," --infile ",raw.train.file," --aux ",aux.train," --outfile ",predictions.train.file,sep=""))
+              coms <- c(coms, paste("scripts/",pt$name," --infile ",raw.test.file," --aux ",aux.test," --outfile ",predictions.test.file,sep=""))
+            }
+          }
+
           aux.train <- aux.test <- ""
           if (!is.null(dataset$eval_aux)) {
             aux.train <- paste(" --aux ","splits/",split,"/",j,"/train/",dataset$eval_aux,sep="")
             aux.test  <- paste(" --aux ","splits/",split,"/",j,"/test/",dataset$eval_aux,sep="")
-          }
-
-          pred_transform <- dataset$pred_transform
-          if (!is.null(pred_transform)) {
-            raw.train.file <- paste(predictions.train.file,".raw",sep="")
-            raw.test.file  <- paste(predictions.test.file,".raw",sep="")
-            coms <- c(coms, paste("mv",predictions.train.file,raw.train.file))
-            coms <- c(coms, paste("mv",predictions.test.file,raw.test.file))
-            coms <- c(coms, paste("scripts/",pred_transform," --infile ",raw.train.file,aux.train," --outfile ",predictions.train.file,sep=""))
-            coms <- c(coms, paste("scripts/",pred_transform," --infile ",raw.test.file,aux.test," --outfile ",predictions.test.file,sep=""))
           }
 
           for (m in dataset$metric) {
